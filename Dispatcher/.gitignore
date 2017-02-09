@@ -82,5 +82,5 @@ build/*
 
 .gradle/*
 
-!libs/*
-!Releases/*
+!libs/*.jar
+!Releases/*.jar
