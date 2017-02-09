@@ -1,10 +1,13 @@
 package net.milosvasic.`try`.dispatcher
 
 import net.milosvasic.dispatcher.Dispatcher
+import net.milosvasic.dispatcher.response.Response
+import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.StaticRouteElement
 import net.milosvasic.logger.ConsoleLogger
+import java.util.*
 
 private class TryDispatcher
 
@@ -15,6 +18,12 @@ fun main(args: Array<String>) {
 
     // TODO: We should implement handling / entry point
 //    val root = Route.Builder().addRouteElement(StaticRouteElement("")).build()
+
+    val factory = object : ResponseFactory {
+        override fun getResponse(): Response {
+            return Response(">>> ${Date()}")
+        }
+    }
 
     val routeUserRepos = Route.Builder()
             .addRouteElement(StaticRouteElement("users"))
@@ -31,9 +40,9 @@ fun main(args: Array<String>) {
             .build()
 
     val dispatcher = Dispatcher()
-    dispatcher.addRoute(routeUserRepos)
-    dispatcher.addRoute(routeAllRepos)
-    dispatcher.addRoute(routeAllUsers)
+    dispatcher.registerRoute(routeUserRepos, factory)
+    dispatcher.registerRoute(routeAllRepos, factory)
+    dispatcher.registerRoute(routeAllUsers, factory)
 //    dispatcher.addRoute(root)
 
     try {

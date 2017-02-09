@@ -1,4 +1,3 @@
 package net.milosvasic.dispatcher.response
 
-class Response {
-}
+data class Response(val content: String)

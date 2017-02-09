@@ -2,8 +2,8 @@ package net.milosvasic.dispatcher.response
 
 import net.milosvasic.dispatcher.route.Route
 
-abstract class ResponseFactory(rout: Route) {
+interface ResponseFactory {
 
-    abstract fun getResponse(): Response
+    fun getResponse(): Response
 
 }

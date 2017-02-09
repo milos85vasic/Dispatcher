@@ -1,8 +1,10 @@
 package net.milosvasic.dispatcher.route
 
+import net.milosvasic.dispatcher.response.ResponseFactory
+
 
 interface Routing {
 
-    fun addRoute(route: Route)
+    fun registerRoute(route: Route, responseFactory: ResponseFactory)
 
 }
