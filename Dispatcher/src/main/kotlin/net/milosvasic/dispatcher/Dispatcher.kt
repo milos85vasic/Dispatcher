@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpServer
 import net.milosvasic.dispatcher.content.Labels
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
-import net.milosvasic.dispatcher.routing.Route
+import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.logger.ConsoleLogger
 import java.net.InetSocketAddress
 import java.util.*

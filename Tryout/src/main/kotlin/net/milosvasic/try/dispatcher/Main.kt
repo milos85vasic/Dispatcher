@@ -1,9 +1,9 @@
 package net.milosvasic.`try`.dispatcher
 
 import net.milosvasic.dispatcher.Dispatcher
-import net.milosvasic.dispatcher.routing.DynamicRouteElement
-import net.milosvasic.dispatcher.routing.Route
-import net.milosvasic.dispatcher.routing.StaticRouteElement
+import net.milosvasic.dispatcher.route.DynamicRouteElement
+import net.milosvasic.dispatcher.route.Route
+import net.milosvasic.dispatcher.route.StaticRouteElement
 import net.milosvasic.logger.ConsoleLogger
 
 private class TryDispatcher

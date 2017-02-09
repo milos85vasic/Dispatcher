@@ -1,6 +1,6 @@
 package net.milosvasic.dispatcher
 
-import net.milosvasic.dispatcher.routing.Routing
+import net.milosvasic.dispatcher.route.Routing
 
 
 interface DispatcherAbstract : Routing {

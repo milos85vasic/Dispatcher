@@ -1,3 +1,3 @@
-package net.milosvasic.dispatcher.routing
+package net.milosvasic.dispatcher.route
 
 class StaticRouteElement(name: String) : RouteElement(name)
