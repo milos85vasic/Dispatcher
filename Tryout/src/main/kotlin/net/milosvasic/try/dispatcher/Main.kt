@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
     val logger = ConsoleLogger()
 
     // TODO: We should implement handling / entry point
-    val root = Route.Builder().addRouteElement(StaticRouteElement("")).build()
+//    val root = Route.Builder().addRouteElement(StaticRouteElement("")).build()
 
     val routeUserRepos = Route.Builder()
             .addRouteElement(StaticRouteElement("users"))
@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
     dispatcher.addRoute(routeUserRepos)
     dispatcher.addRoute(routeAllRepos)
     dispatcher.addRoute(routeAllUsers)
-    dispatcher.addRoute(root)
+//    dispatcher.addRoute(root)
 
     try {
         dispatcher.start(2507)

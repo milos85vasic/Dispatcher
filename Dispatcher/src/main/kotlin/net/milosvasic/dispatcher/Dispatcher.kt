@@ -18,19 +18,23 @@ class Dispatcher : DispatcherAbstract {
     private val routes = Collections.synchronizedSet(HashSet<Route>())
 
     override fun start(port: Int) {
-        server = HttpServer.create(InetSocketAddress(port), 0)
-        server?.executor = executor
-        if (server != null) {
+        if (server == null) {
+            server = HttpServer.create(InetSocketAddress(port), 0)
+            server?.executor = executor
+
             Runtime.getRuntime().addShutdownHook(Thread(Runnable {
                 stop()
                 logger.d(LOG_TAG, Messages.DISPATCHER_TERMINATED)
                 System.exit(0)
             }))
+
             Thread(Runnable {
                 Thread.currentThread().name = Labels.DISPATCHER_STARTING_THREAD
                 server?.start()
                 logger.v(LOG_TAG, Messages.DISPATCHER_RUNNING)
             }).start()
+        } else {
+            throw IllegalStateException(Messages.DISPATCHER_ALREADY_RUNNING)
         }
     }
 
