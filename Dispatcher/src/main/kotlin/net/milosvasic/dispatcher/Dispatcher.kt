@@ -4,11 +4,11 @@ import com.sun.net.httpserver.HttpServer
 import net.milosvasic.dispatcher.content.Labels
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
+import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.logger.ConsoleLogger
 import java.net.InetSocketAddress
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class Dispatcher : DispatcherAbstract {
@@ -17,7 +17,8 @@ class Dispatcher : DispatcherAbstract {
     private var server: HttpServer? = null
     private val LOG_TAG = Dispatcher::class
     private val executor = TaskExecutor.instance(10)
-    private val routes = ConcurrentHashMap<Route, ResponseFactory>()
+    private val actionRoutes = ConcurrentHashMap<Route, ResponseAction>()
+    private val responseRoutes = ConcurrentHashMap<Route, ResponseFactory>()
 
     override fun start(port: Int) {
         if (server == null) {
@@ -45,7 +46,13 @@ class Dispatcher : DispatcherAbstract {
     }
 
     override fun registerRoute(route: Route, responseFactory: ResponseFactory) {
-        routes.put(route, responseFactory)
+        if (actionRoutes.keys.contains(route)) throw IllegalStateException(Messages.ROUTE_ALREADY_REGISTERED_AS_ACTION_ROUTE)
+        responseRoutes.put(route, responseFactory)
+    }
+
+    override fun registerRoute(route: Route, responseAction: ResponseAction) {
+        if (actionRoutes.keys.contains(route)) throw IllegalStateException(Messages.ROUTE_ALREADY_REGISTERED_AS_RESPONSE_ROUTE)
+        actionRoutes.put(route, responseAction)
     }
 
 }
