@@ -1,7 +1,9 @@
 package net.milosvasic.dispatcher
 
+import net.milosvasic.dispatcher.routing.Routing
 
-interface DispatcherAbstract {
+
+interface DispatcherAbstract : Routing {
 
     fun start(port: Int)
 
