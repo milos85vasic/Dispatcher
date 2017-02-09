@@ -34,11 +34,11 @@ dependencies {
     compile project(':Dispatcher')
 }
 
-mainClassName = "net.milosvasic.pussycat.android.MainKt"
+mainClassName = "net.milosvasic.try.dispatcher.MainKt"
 
 jar {
     manifest {
-        attributes "Main-Class": "net.milosvasic.pussycat.android.MainKt"
+        attributes "Main-Class": "net.milosvasic.try.dispatcher.MainKt"
     }
 
     from {
