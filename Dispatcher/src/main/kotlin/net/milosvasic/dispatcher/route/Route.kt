@@ -1,8 +1,6 @@
 package net.milosvasic.dispatcher.route
 
 
-
-
 class Route private constructor() {
 
     private val elements = mutableListOf<RouteElement>()
@@ -13,6 +11,9 @@ class Route private constructor() {
             when (element) {
                 is RootRouteElement -> {
                     builder.append("(/)")
+                }
+                is StaticRouteElement -> {
+                    builder.append("(/${element.name})")
                 }
             }
         }

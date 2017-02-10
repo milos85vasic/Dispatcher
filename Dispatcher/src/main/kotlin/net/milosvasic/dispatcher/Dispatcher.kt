@@ -103,7 +103,10 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
     private fun getRoute(exchange: HttpExchange): Route? {
         val routesSet = LinkedHashSet<Route>()
         if (!responseRoutes.isEmpty() || !actionRoutes.isEmpty()) {
-            val path = exchange.requestURI.path
+            var path = exchange.requestURI.path
+            if (path.length > 1 && path.endsWith("/")) {
+                path = path.substring(0, path.lastIndex)
+            }
             val responseRoutesSet = responseRoutes.keys
                     .filter { matchRoute(it, path) }
                     .toSet()

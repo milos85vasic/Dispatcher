@@ -1,4 +1,4 @@
 package net.milosvasic.dispatcher.route
 
 
-abstract class RouteElement(name: String)
+abstract class RouteElement(val name: String)
