@@ -9,6 +9,7 @@ import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
 import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.ResponseFactory
+import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.RouteElement
 import net.milosvasic.logger.ConsoleLogger
@@ -139,7 +140,9 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
             if (matcher.matches()) {
                 route.getElements().forEachIndexed {
                     index, element ->
-                    params.put(element, matcher.group(index))
+                    if (element is DynamicRouteElement) {
+                        params.put(element, matcher.group(index + 1))
+                    }
                 }
             }
         } catch (e: Exception) {
