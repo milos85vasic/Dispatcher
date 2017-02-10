@@ -58,12 +58,10 @@ class Dispatcher : DispatcherAbstract {
     }
 
     override fun registerRoute(route: Route, responseFactory: ResponseFactory) {
-        if (actionRoutes.keys.contains(route)) throw IllegalStateException(Messages.ROUTE_ALREADY_REGISTERED_AS_ACTION_ROUTE)
         responseRoutes.put(route, responseFactory)
     }
 
     override fun registerRoute(route: Route, responseAction: ResponseAction) {
-        if (actionRoutes.keys.contains(route)) throw IllegalStateException(Messages.ROUTE_ALREADY_REGISTERED_AS_RESPONSE_ROUTE)
         actionRoutes.put(route, responseAction)
     }
 

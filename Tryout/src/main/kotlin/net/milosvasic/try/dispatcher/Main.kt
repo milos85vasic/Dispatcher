@@ -2,6 +2,7 @@ package net.milosvasic.`try`.dispatcher
 
 import net.milosvasic.dispatcher.Dispatcher
 import net.milosvasic.dispatcher.response.Response
+import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.RootRouteElement
@@ -25,6 +26,12 @@ fun main(args: Array<String>) {
         }
     }
 
+    val action = object : ResponseAction {
+        override fun onAction() {
+            println("Action taken!")
+        }
+    }
+
     val routeUserRepos = Route.Builder()
             .addRouteElement(StaticRouteElement("users"))
             .addRouteElement(DynamicRouteElement("username"))
@@ -44,6 +51,7 @@ fun main(args: Array<String>) {
     dispatcher.registerRoute(routeUserRepos, factory)
     dispatcher.registerRoute(routeAllRepos, factory)
     dispatcher.registerRoute(routeAllUsers, factory)
+    dispatcher.registerRoute(routeAllUsers, action) // We registered action for user route too!
 
     try {
         dispatcher.start(2507)
