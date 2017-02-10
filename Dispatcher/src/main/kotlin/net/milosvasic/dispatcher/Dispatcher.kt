@@ -33,7 +33,6 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
         } catch (e: Exception) {
             // Ignore
         }
-        logger.d(LOG_TAG, Messages.DISPATCHER_TERMINATED)
     })
 
     init {
@@ -56,6 +55,7 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
         if (running.get()) {
             server.stop(0)
             running.set(false)
+            logger.d(LOG_TAG, Messages.DISPATCHER_TERMINATED)
         } else {
             throw IllegalStateException(Messages.DISPATCHER_NOT_RUNNING)
         }
@@ -84,13 +84,15 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
                         code = 200
                         response = Messages.OK
                     }
+                    exchange.sendResponseHeaders(code, response.length.toLong())
+                    sendResponse(exchange, response)
                     actionRoutes[route]?.onAction()
                 } else {
                     code = 404
                     response = Messages.ERROR_404
+                    exchange.sendResponseHeaders(code, response.length.toLong())
+                    sendResponse(exchange, response)
                 }
-                exchange.sendResponseHeaders(code, response.length.toLong())
-                sendResponse(exchange, response)
             }
             else -> {
                 val response = "${Messages.METHOD_NOT_SUPPORTED} Method [ ${exchange.requestMethod} ]"

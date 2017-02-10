@@ -65,4 +65,19 @@ fun main(args: Array<String>) {
         logger.e(LOG_TAG, "Error: " + e)
     }
 
+    Thread.sleep(5000)
+
+    // Register route after we started dispatcher
+    val routeStop = Route.Builder().addRouteElement(StaticRouteElement("stop")).build()
+    val stop = object : ResponseAction {
+        override fun onAction() {
+            try {
+                dispatcher.stop()
+            } catch (e: Exception) {
+                logger.e(LOG_TAG, "Error: " + e)
+            }
+        }
+    }
+    dispatcher.registerRoute(routeStop, stop)
+
 }
