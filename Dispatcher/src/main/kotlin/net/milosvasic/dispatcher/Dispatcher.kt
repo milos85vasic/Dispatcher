@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
+import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.Route
@@ -39,14 +40,6 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
         Runtime.getRuntime().addShutdownHook(hook)
     }
 
-    private fun handleExchange(exchange: HttpExchange) {
-        val response = "This is the response"
-        exchange.sendResponseHeaders(200, response.length.toLong())
-        val os = exchange.responseBody
-        os?.write(response.toByteArray())
-        os?.close()
-    }
-
     override fun start() {
         if (!running.get()) {
             server.start()
@@ -72,6 +65,27 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
 
     override fun registerRoute(route: Route, responseAction: ResponseAction) {
         actionRoutes.put(route, responseAction)
+    }
+
+    private fun handleExchange(exchange: HttpExchange) {
+        when (exchange.requestMethod) {
+            REQUEST_METHOD.GET -> {
+                val response = "This is the response"
+                exchange.sendResponseHeaders(200, response.length.toLong())
+                sendResponse(exchange, response)
+            }
+            else -> {
+                val response = "${Messages.METHOD_NOT_SUPPORTED} Method [ ${exchange.requestMethod} ]"
+                exchange.sendResponseHeaders(501, response.length.toLong())
+                sendResponse(exchange, response)
+            }
+        }
+    }
+
+    private fun sendResponse(exchange: HttpExchange, response: String) {
+        val os = exchange.responseBody
+        os?.write(response.toByteArray())
+        os?.close()
     }
 
 }
