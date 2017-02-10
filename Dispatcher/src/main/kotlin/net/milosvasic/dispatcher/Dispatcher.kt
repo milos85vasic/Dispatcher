@@ -6,9 +6,11 @@ import com.sun.net.httpserver.HttpServer
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
+import net.milosvasic.dispatcher.request.RequestPath
 import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.Route
+import net.milosvasic.dispatcher.route.RouteElement
 import net.milosvasic.logger.ConsoleLogger
 import java.net.InetSocketAddress
 import java.util.*
@@ -76,7 +78,8 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
                 val response: String
                 val route = getRoute(exchange)
                 if (route != null) {
-                    val routeResponse = responseRoutes[route]?.getResponse()
+                    val params = getParams(route, RequestPath(exchange))
+                    val routeResponse = responseRoutes[route]?.getResponse(params)
                     if (routeResponse != null) {
                         code = routeResponse.code
                         response = routeResponse.content
@@ -105,16 +108,14 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
     private fun getRoute(exchange: HttpExchange): Route? {
         val routesSet = LinkedHashSet<Route>()
         if (!responseRoutes.isEmpty() || !actionRoutes.isEmpty()) {
-            var path = exchange.requestURI.path
-            if (path.length > 1 && path.endsWith("/")) {
-                path = path.substring(0, path.lastIndex)
-            }
+            val path = RequestPath(exchange)
+
             val responseRoutesSet = responseRoutes.keys
-                    .filter { matchRoute(it, path) }
+                    .filter { matchRoute(it, path.value) }
                     .toSet()
 
             val actionRoutesSet = actionRoutes.keys
-                    .filter { matchRoute(it, path) }
+                    .filter { matchRoute(it, path.value) }
                     .toSet()
 
             routesSet.addAll(actionRoutesSet)
@@ -127,6 +128,24 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
             return routesSet.first()
         }
         return null
+    }
+
+    private fun getParams(route: Route, path: RequestPath): HashMap<RouteElement, String> {
+        val params = HashMap<RouteElement, String>()
+        try {
+            val regex = route.getRegex()
+            val pattern = Pattern.compile(regex)
+            val matcher = pattern.matcher(path.value)
+            if (matcher.matches()) {
+                route.getElements().forEachIndexed {
+                    index, element ->
+                    params.put(element, matcher.group(index))
+                }
+            }
+        } catch (e: Exception) {
+            logger.e(LOG_TAG, e.toString())
+        }
+        return params
     }
 
     private fun matchRoute(route: Route, path: String?): Boolean {

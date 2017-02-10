@@ -4,10 +4,7 @@ import net.milosvasic.dispatcher.Dispatcher
 import net.milosvasic.dispatcher.response.Response
 import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.ResponseFactory
-import net.milosvasic.dispatcher.route.DynamicRouteElement
-import net.milosvasic.dispatcher.route.RootRouteElement
-import net.milosvasic.dispatcher.route.Route
-import net.milosvasic.dispatcher.route.StaticRouteElement
+import net.milosvasic.dispatcher.route.*
 import net.milosvasic.logger.ConsoleLogger
 import java.util.*
 
@@ -21,8 +18,8 @@ fun main(args: Array<String>) {
     val root = Route.Builder().addRouteElement(RootRouteElement()).build()
 
     val factory = object : ResponseFactory {
-        override fun getResponse(): Response {
-            return Response(">>> ${Date()}")
+        override fun getResponse(params: HashMap<RouteElement, String>): Response {
+            return Response("Executed ${Date()} [ ${params.size} ]")
         }
     }
 
@@ -65,8 +62,6 @@ fun main(args: Array<String>) {
         logger.e(LOG_TAG, "Error: " + e)
     }
 
-    Thread.sleep(5000)
-
     // Register route after we started dispatcher
     val routeStop = Route.Builder().addRouteElement(StaticRouteElement("stop")).build()
     val stop = object : ResponseAction {
@@ -78,6 +73,37 @@ fun main(args: Array<String>) {
             }
         }
     }
+    dispatcher.registerRoute(routeStop, object : ResponseFactory {
+        override fun getResponse(params: HashMap<RouteElement, String>): Response {
+            return Response("<h1>Dispatcher stopped</h1>")
+        }
+    })
     dispatcher.registerRoute(routeStop, stop)
+
+    val accountsParams = "accounts"
+    val userParam = "user"
+    val attributesParam = "attributes"
+    val operationParam = "operation"
+    val routeAccounts = Route.Builder()
+            .addRouteElement(StaticRouteElement(accountsParams))
+            .addRouteElement(DynamicRouteElement(userParam))
+            .addRouteElement(StaticRouteElement(attributesParam))
+            .addRouteElement(DynamicRouteElement(operationParam))
+            .build()
+
+    val factoryAccounts = object : ResponseFactory {
+        override fun getResponse(params: HashMap<RouteElement, String>): Response {
+            val builder = StringBuilder("<h1>We have parameters:</h1>")
+            builder.append("<ul>")
+            params.forEach {
+                element, value ->
+                builder.append("<li>${element.name} -> $value</li>")
+            }
+            builder.append("</ul>")
+            return Response(builder.toString())
+        }
+    }
+
+    dispatcher.registerRoute(routeAccounts, factoryAccounts)
 
 }

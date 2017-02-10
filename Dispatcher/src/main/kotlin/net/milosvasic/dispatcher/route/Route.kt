@@ -23,12 +23,15 @@ class Route private constructor() {
         return builder.toString()
     }
 
+    fun getElements(): List<RouteElement> {
+        return elements
+    }
+
     private fun addRouteElement(element: RouteElement) {
         elements.add(element)
     }
 
     class Builder {
-
         private val elements = mutableListOf<RouteElement>()
 
         fun addRouteElement(element: RouteElement): Builder {
