@@ -4,6 +4,7 @@ import net.milosvasic.dispatcher.Dispatcher
 import net.milosvasic.dispatcher.response.Response
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.DynamicRouteElement
+import net.milosvasic.dispatcher.route.RootRouteElement
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.StaticRouteElement
 import net.milosvasic.logger.ConsoleLogger
@@ -16,8 +17,7 @@ fun main(args: Array<String>) {
     val LOG_TAG = TryDispatcher::class
     val logger = ConsoleLogger()
 
-    // TODO: We should implement handling / entry point
-//    val root = Route.Builder().addRouteElement(StaticRouteElement("")).build()
+    val root = Route.Builder().addRouteElement(RootRouteElement()).build()
 
     val factory = object : ResponseFactory {
         override fun getResponse(): Response {
@@ -40,10 +40,10 @@ fun main(args: Array<String>) {
             .build()
 
     val dispatcher = Dispatcher()
+    dispatcher.registerRoute(root, factory)
     dispatcher.registerRoute(routeUserRepos, factory)
     dispatcher.registerRoute(routeAllRepos, factory)
     dispatcher.registerRoute(routeAllUsers, factory)
-//    dispatcher.addRoute(root)
 
     try {
         dispatcher.start(2507)

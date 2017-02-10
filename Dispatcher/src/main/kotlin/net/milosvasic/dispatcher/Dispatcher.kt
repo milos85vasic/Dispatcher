@@ -1,5 +1,7 @@
 package net.milosvasic.dispatcher
 
+import com.sun.net.httpserver.HttpExchange
+import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
 import net.milosvasic.dispatcher.content.Labels
 import net.milosvasic.dispatcher.content.Messages
@@ -10,6 +12,8 @@ import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.logger.ConsoleLogger
 import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
+import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
+
 
 class Dispatcher : DispatcherAbstract {
     private val logger = ConsoleLogger()
@@ -24,6 +28,14 @@ class Dispatcher : DispatcherAbstract {
         if (server == null) {
             server = HttpServer.create(InetSocketAddress(port), 0)
             server?.executor = executor
+            val context = server?.createContext("/") { t ->
+                val response = "This is the response"
+                t?.sendResponseHeaders(200, response.length.toLong())
+                val os = t?.responseBody
+                os?.write(response.toByteArray())
+                os?.close()
+            }
+
 
             Runtime.getRuntime().addShutdownHook(Thread(Runnable {
                 stop()
