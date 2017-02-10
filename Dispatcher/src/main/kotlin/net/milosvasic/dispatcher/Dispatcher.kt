@@ -1,6 +1,7 @@
 package net.milosvasic.dispatcher
 
 
+import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
@@ -34,22 +35,20 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
 
     init {
         server.executor = executor
+        server.createContext("/", { exchange -> handleExchange(exchange) })
         Runtime.getRuntime().addShutdownHook(hook)
+    }
+
+    private fun handleExchange(exchange: HttpExchange) {
+        val response = "This is the response"
+        exchange.sendResponseHeaders(200, response.length.toLong())
+        val os = exchange.responseBody
+        os?.write(response.toByteArray())
+        os?.close()
     }
 
     override fun start() {
         if (!running.get()) {
-            server.createContext(
-                    "/",
-                    { t ->
-                        val response = "This is the response"
-                        t?.sendResponseHeaders(200, response.length.toLong())
-                        val os = t?.responseBody
-                        os?.write(response.toByteArray())
-                        os?.close()
-                    }
-            )
-
             server.start()
             running.set(true)
             logger.v(LOG_TAG, Messages.DISPATCHER_RUNNING)
