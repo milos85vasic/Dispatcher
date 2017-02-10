@@ -32,5 +32,12 @@ dependencies {
     compile files("libs/Logger_V1.0.jar")
 }
 
-version = "1.0_Alpha"
+int alpha = 1
+int versionNumber = 1
+int secondaryVersion = 0
+int tertiaryVersion = 0
+version = String.format("%d.%d.%d", versionNumber, secondaryVersion, tertiaryVersion)
+if (alpha > 0) {
+    version += "_Alpha_" + alpha
+}
 jar.archiveName = "Dispatcher_V" + version + ".jar"
