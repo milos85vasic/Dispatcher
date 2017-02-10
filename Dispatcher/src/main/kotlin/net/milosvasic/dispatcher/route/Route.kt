@@ -1,9 +1,23 @@
 package net.milosvasic.dispatcher.route
 
 
+
+
 class Route private constructor() {
 
     private val elements = mutableListOf<RouteElement>()
+
+    fun getRegex(): String {
+        val builder = StringBuilder()
+        for (element in elements) {
+            when (element) {
+                is RootRouteElement -> {
+                    builder.append("(/)")
+                }
+            }
+        }
+        return builder.toString()
+    }
 
     private fun addRouteElement(element: RouteElement) {
         elements.add(element)

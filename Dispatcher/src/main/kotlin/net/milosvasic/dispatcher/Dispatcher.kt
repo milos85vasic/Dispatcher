@@ -11,8 +11,10 @@ import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.logger.ConsoleLogger
 import java.net.InetSocketAddress
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.regex.Pattern
 
 
 class Dispatcher(port: Int) : DispatcherAbstract(port) {
@@ -74,8 +76,14 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
                 val response: String
                 val route = getRoute(exchange)
                 if (route != null) {
-                    code = 200
-                    response = getResponse(route)
+                    val routeResponse = responseRoutes[route]?.getResponse()
+                    if (routeResponse != null) {
+                        code = routeResponse.code
+                        response = routeResponse.content
+                    } else {
+                        code = 200
+                        response = Messages.OK
+                    }
                     actionRoutes[route]?.onAction()
                 } else {
                     code = 404
@@ -93,12 +101,39 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
     }
 
     private fun getRoute(exchange: HttpExchange): Route? {
-        return null // TODO: Handle this
+        val routesSet = LinkedHashSet<Route>()
+        if (!responseRoutes.isEmpty() || !actionRoutes.isEmpty()) {
+            val path = exchange.requestURI.path
+            val responseRoutesSet = responseRoutes.keys
+                    .filter { matchRoute(it, path) }
+                    .toSet()
+
+            val actionRoutesSet = actionRoutes.keys
+                    .filter { matchRoute(it, path) }
+                    .toSet()
+
+            routesSet.addAll(actionRoutesSet)
+            routesSet.addAll(responseRoutesSet)
+
+            if (actionRoutesSet.size > 1) logger.w(LOG_TAG, Messages.ACTION_ROUTES_SHADOWING)
+            if (responseRoutesSet.size > 1) logger.w(LOG_TAG, Messages.RESPONSE_ROUTES_SHADOWING)
+        }
+        if (!routesSet.isEmpty()) {
+            return routesSet.first()
+        }
+        return null
     }
 
-    private fun getResponse(route: Route): String {
-        // TODO: Handle this
-        return Messages.OK
+    private fun matchRoute(route: Route, path: String?): Boolean {
+        try {
+            val regex = route.getRegex()
+            val pattern = Pattern.compile(regex)
+            val matcher = pattern.matcher(path)
+            return matcher.matches()
+        } catch (e: Exception) {
+            logger.e(LOG_TAG, e.toString())
+        }
+        return false
     }
 
     private fun sendResponse(exchange: HttpExchange, response: String) {
