@@ -3,10 +3,10 @@ package net.milosvasic.dispatcher
 import net.milosvasic.dispatcher.route.Routing
 
 
-interface DispatcherAbstract : Routing {
+abstract class DispatcherAbstract(val port: Int) : Routing {
 
-    fun start(port: Int)
+    abstract fun start()
 
-    fun stop()
+    abstract fun stop()
 
 }

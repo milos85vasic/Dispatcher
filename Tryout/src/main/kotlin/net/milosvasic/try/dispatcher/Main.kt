@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
             .addRouteElement(StaticRouteElement("users"))
             .build()
 
-    val dispatcher = Dispatcher()
+    val dispatcher = Dispatcher(2507)
     dispatcher.registerRoute(root, factory)
     dispatcher.registerRoute(routeUserRepos, factory)
     dispatcher.registerRoute(routeAllRepos, factory)
@@ -54,7 +54,7 @@ fun main(args: Array<String>) {
     dispatcher.registerRoute(routeAllUsers, action) // We registered action for user route too!
 
     try {
-        dispatcher.start(2507)
+        dispatcher.start()
     } catch (e: Exception) {
         logger.e(LOG_TAG, "Error: " + e)
     }

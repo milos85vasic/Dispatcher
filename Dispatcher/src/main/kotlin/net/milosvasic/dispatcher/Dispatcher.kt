@@ -1,9 +1,7 @@
 package net.milosvasic.dispatcher
 
-import com.sun.net.httpserver.HttpExchange
-import com.sun.net.httpserver.HttpHandler
+
 import com.sun.net.httpserver.HttpServer
-import net.milosvasic.dispatcher.content.Labels
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
 import net.milosvasic.dispatcher.response.ResponseAction
@@ -12,49 +10,61 @@ import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.logger.ConsoleLogger
 import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
-import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
+import java.util.concurrent.atomic.AtomicBoolean
 
 
-class Dispatcher : DispatcherAbstract {
+class Dispatcher(port: Int) : DispatcherAbstract(port) {
+
     private val logger = ConsoleLogger()
-
-    private var server: HttpServer? = null
     private val LOG_TAG = Dispatcher::class
+    private val running = AtomicBoolean(false)
     private val executor = TaskExecutor.instance(10)
     private val actionRoutes = ConcurrentHashMap<Route, ResponseAction>()
     private val responseRoutes = ConcurrentHashMap<Route, ResponseFactory>()
+    private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
 
-    override fun start(port: Int) {
-        if (server == null) {
-            server = HttpServer.create(InetSocketAddress(port), 0)
-            server?.executor = executor
-            val context = server?.createContext("/") { t ->
-                val response = "This is the response"
-                t?.sendResponseHeaders(200, response.length.toLong())
-                val os = t?.responseBody
-                os?.write(response.toByteArray())
-                os?.close()
-            }
+    private val hook = Thread(Runnable {
+        try {
+            stop()
+        } catch (e: Exception) {
+            // Ignore
+        }
+        logger.d(LOG_TAG, Messages.DISPATCHER_TERMINATED)
+    })
 
+    init {
+        server.executor = executor
+        Runtime.getRuntime().addShutdownHook(hook)
+    }
 
-            Runtime.getRuntime().addShutdownHook(Thread(Runnable {
-                stop()
-                logger.d(LOG_TAG, Messages.DISPATCHER_TERMINATED)
-                System.exit(0)
-            }))
+    override fun start() {
+        if (!running.get()) {
+            server.createContext(
+                    "/",
+                    { t ->
+                        val response = "This is the response"
+                        t?.sendResponseHeaders(200, response.length.toLong())
+                        val os = t?.responseBody
+                        os?.write(response.toByteArray())
+                        os?.close()
+                    }
+            )
 
-            Thread(Runnable {
-                Thread.currentThread().name = Labels.DISPATCHER_STARTING_THREAD
-                server?.start()
-                logger.v(LOG_TAG, Messages.DISPATCHER_RUNNING)
-            }).start()
+            server.start()
+            running.set(true)
+            logger.v(LOG_TAG, Messages.DISPATCHER_RUNNING)
         } else {
             throw IllegalStateException(Messages.DISPATCHER_ALREADY_RUNNING)
         }
     }
 
     override fun stop() {
-        server?.stop(0)
+        if (running.get()) {
+            server.stop(0)
+            running.set(false)
+        } else {
+            throw IllegalStateException(Messages.DISPATCHER_NOT_RUNNING)
+        }
     }
 
     override fun registerRoute(route: Route, responseFactory: ResponseFactory) {
