@@ -13,7 +13,10 @@ class Route private constructor() {
                     builder.append("(/)")
                 }
                 is StaticRouteElement -> {
-                    builder.append("(/${element.name})")
+                    builder.append("/(${element.name})")
+                }
+                is DynamicRouteElement -> {
+                    builder.append("/(\\w+)")
                 }
             }
         }

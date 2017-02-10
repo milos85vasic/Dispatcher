@@ -32,6 +32,11 @@ fun main(args: Array<String>) {
         }
     }
 
+    val routeCatalogs = Route.Builder()
+            .addRouteElement(StaticRouteElement("catalogs"))
+            .addRouteElement(DynamicRouteElement("catalog"))
+            .build()
+
     val routeUserRepos = Route.Builder()
             .addRouteElement(StaticRouteElement("users"))
             .addRouteElement(DynamicRouteElement("username"))
@@ -52,6 +57,7 @@ fun main(args: Array<String>) {
     dispatcher.registerRoute(routeAllRepos, factory)
     dispatcher.registerRoute(routeAllUsers, factory)
     dispatcher.registerRoute(routeAllUsers, action) // We registered action for user route too!
+    dispatcher.registerRoute(routeCatalogs, factory)
 
     try {
         dispatcher.start()
