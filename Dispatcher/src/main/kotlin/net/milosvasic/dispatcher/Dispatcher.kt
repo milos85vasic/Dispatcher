@@ -70,8 +70,18 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
     private fun handleExchange(exchange: HttpExchange) {
         when (exchange.requestMethod) {
             REQUEST_METHOD.GET -> {
-                val response = "This is the response"
-                exchange.sendResponseHeaders(200, response.length.toLong())
+                val code: Int
+                val response: String
+                val route = getRoute(exchange)
+                if (route != null) {
+                    code = 200
+                    response = getResponse(route)
+                    actionRoutes[route]?.onAction()
+                } else {
+                    code = 404
+                    response = Messages.ERROR_404
+                }
+                exchange.sendResponseHeaders(code, response.length.toLong())
                 sendResponse(exchange, response)
             }
             else -> {
@@ -80,6 +90,15 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
                 sendResponse(exchange, response)
             }
         }
+    }
+
+    private fun getRoute(exchange: HttpExchange): Route? {
+        return null // TODO: Handle this
+    }
+
+    private fun getResponse(route: Route): String {
+        // TODO: Handle this
+        return Messages.OK
     }
 
     private fun sendResponse(exchange: HttpExchange, response: String) {
