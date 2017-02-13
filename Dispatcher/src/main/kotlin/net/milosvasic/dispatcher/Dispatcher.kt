@@ -140,6 +140,7 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
     }
 
     private fun handleExchange(exchange: HttpExchange) {
+        logger.v(LOG_TAG, ">>> [ ${exchange.requestMethod} ] ${exchange.requestURI}")
         when (exchange.requestMethod) {
             REQUEST_METHOD.GET -> {
                 val code: Int

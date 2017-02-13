@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
 
     val action = object : ResponseAction {
         override fun onAction() {
-            println("Action taken!")
+            logger.v(LOG_TAG, "Action taken!")
         }
     }
 
@@ -104,10 +104,5 @@ fun main(args: Array<String>) {
     }
 
     dispatcher.registerRoute(routeAccounts, factoryAccounts)
-    dispatcher.registerRoute(routeAccounts, factoryAccounts)
-    dispatcher.registerRoute(routeAccounts, factoryAccounts) // Trying warn logs
-
-    Thread.sleep(10000)
-    dispatcher.unregisterRoute(routeCatalogs)
 
 }
