@@ -165,6 +165,7 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
                     exchange.sendResponseHeaders(code, response.length.toLong())
                     sendResponse(exchange, response)
                 }
+                logger.v(LOG_TAG, "<<< [ $code ] ${exchange.requestURI}")
             }
             else -> {
                 val response = "${Messages.METHOD_NOT_SUPPORTED} Method [ ${exchange.requestMethod} ]"
