@@ -11,42 +11,42 @@ import kotlin.reflect.KClass
 
 internal class DispatcherLogger(val naming: Naming) : Logger {
 
-    private val logger = ConsoleLogger()
-    private val loggerFs = FilesystemLogger(getHome())
+    val console = ConsoleLogger()
+    val filesystem = FilesystemLogger(getHome())
 
     override fun c(tag: KClass<*>, message: String) {
-        logger.c(tag, message)
-        loggerFs.c(tag, message)
+        console.c(tag, message)
+        filesystem.c(tag, message)
     }
 
     override fun d(tag: KClass<*>, message: String) {
-        logger.d(tag, message)
-        loggerFs.d(tag, message)
+        console.d(tag, message)
+        filesystem.d(tag, message)
     }
 
     override fun e(tag: KClass<*>, message: String) {
-        logger.e(tag, message)
-        loggerFs.e(tag, message)
+        console.e(tag, message)
+        filesystem.e(tag, message)
     }
 
     override fun i(tag: KClass<*>, message: String) {
-        logger.i(tag, message)
-        loggerFs.i(tag, message)
+        console.i(tag, message)
+        filesystem.i(tag, message)
     }
 
     override fun n(tag: KClass<*>, message: String) {
-        logger.n(tag, message)
-        loggerFs.n(tag, message)
+        console.n(tag, message)
+        filesystem.n(tag, message)
     }
 
     override fun v(tag: KClass<*>, message: String) {
-        logger.v(tag, message)
-        loggerFs.v(tag, message)
+        console.v(tag, message)
+        filesystem.v(tag, message)
     }
 
     override fun w(tag: KClass<*>, message: String) {
-        logger.w(tag, message)
-        loggerFs.w(tag, message)
+        console.w(tag, message)
+        filesystem.w(tag, message)
     }
 
     fun getHome(): File {

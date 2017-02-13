@@ -3,6 +3,7 @@ package net.milosvasic.dispatcher
 
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
+import net.milosvasic.dispatcher.content.Labels
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
 import net.milosvasic.dispatcher.logging.DispatcherLogger
@@ -68,12 +69,24 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
 
     override fun registerRoute(route: Route, responseFactory: ResponseFactory): Boolean {
         responseRoutes.put(route, responseFactory)
-        return responseRoutes.keys.contains(route)
+        val result = responseRoutes.keys.contains(route)
+        if (result) {
+            logger.i(LOG_TAG, "Route with response [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+        } else {
+            logger.w(LOG_TAG, "Route with response [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+        }
+        return result
     }
 
     override fun registerRoute(route: Route, responseAction: ResponseAction): Boolean {
         actionRoutes.put(route, responseAction)
-        return actionRoutes.keys.contains(route)
+        val result = actionRoutes.keys.contains(route)
+        if (result) {
+            logger.i(LOG_TAG, "Route with action [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+        } else {
+            logger.w(LOG_TAG, "Route with action [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+        }
+        return result
     }
 
     override fun unregisterRoute(route: Route): Boolean {
@@ -90,6 +103,7 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
                 throw RouteUnregisterException()
             }
         }
+        logger.i(LOG_TAG, "Route [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ]")
         return success
     }
 
@@ -101,6 +115,7 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
                 throw RouteUnregisterException()
             }
         }
+        logger.i(LOG_TAG, "Route with response [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ]")
         return success
     }
 
@@ -112,6 +127,7 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
                 throw RouteUnregisterException()
             }
         }
+        logger.i(LOG_TAG, "Route with action [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ]")
         return success
     }
 
