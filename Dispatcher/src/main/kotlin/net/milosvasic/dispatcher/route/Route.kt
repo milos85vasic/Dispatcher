@@ -48,4 +48,25 @@ class Route private constructor() {
         }
     }
 
+    override fun toString(): String {
+        return printRoute()
+    }
+
+    private fun printRoute(): String {
+        val builder = StringBuilder()
+        for (element in elements) {
+            when (element) {
+                is RootRouteElement -> {
+                    builder.append("/")
+                }
+                is StaticRouteElement -> {
+                    builder.append("/${element.name}")
+                }
+                is DynamicRouteElement -> {
+                    builder.append("/{${element.name}}")
+                }
+            }
+        }
+        return builder.toString()
+    }
 }

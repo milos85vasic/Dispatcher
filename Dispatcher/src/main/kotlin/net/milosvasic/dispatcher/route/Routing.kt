@@ -12,4 +12,8 @@ interface Routing {
 
     fun unregisterRoute(route: Route): Boolean
 
+    fun unregisterRoute(route: Route, responseAction: ResponseAction): Boolean
+
+    fun unregisterRoute(route: Route, responseFactory: ResponseFactory): Boolean
+
 }

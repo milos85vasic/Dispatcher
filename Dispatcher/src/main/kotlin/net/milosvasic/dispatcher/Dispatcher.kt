@@ -12,6 +12,7 @@ import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.RouteElement
+import net.milosvasic.dispatcher.route.exception.RouteUnregisterException
 import net.milosvasic.logger.ConsoleLogger
 import java.net.InetSocketAddress
 import java.util.*
@@ -76,11 +77,36 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
         var success = false
         if (actionRoutes.keys.contains(route)) {
             success = actionRoutes.remove(route) != null
+            if (!success) {
+                throw RouteUnregisterException()
+            }
         }
         if (responseRoutes.keys.contains(route)) {
-            val result = responseRoutes.remove(route) != null
-            if (success) {
-                success = result
+            success = responseRoutes.remove(route) != null
+            if (!success) {
+                throw RouteUnregisterException()
+            }
+        }
+        return success
+    }
+
+    override fun unregisterRoute(route: Route, responseFactory: ResponseFactory): Boolean {
+        var success = false
+        if (responseRoutes.keys.contains(route)) {
+            success = responseRoutes.remove(route, responseFactory)
+            if (!success) {
+                throw RouteUnregisterException()
+            }
+        }
+        return success
+    }
+
+    override fun unregisterRoute(route: Route, responseAction: ResponseAction): Boolean {
+        var success = false
+        if (actionRoutes.keys.contains(route)) {
+            success = actionRoutes.remove(route, responseAction)
+            if (!success) {
+                throw RouteUnregisterException()
             }
         }
         return success
