@@ -109,7 +109,7 @@ dispatcher.registerRoute(routeAllUsers, action)
 ```
 ## Logging
 Dispatcher uses [Logger](https://github.com/milos85vasic/Logger) library for logging.
-By default it logs to console outpu and filesystem both.
+By default it logs to console output and filesystem both.
 You can set your own logger:
 ```
 dispatcher.logger = SomeLoggerImplementation()
