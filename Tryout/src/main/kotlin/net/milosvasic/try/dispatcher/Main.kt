@@ -104,10 +104,11 @@ fun main(args: Array<String>) {
         }
     }
 
-    dispatcher.registerRoute(routeAccounts, factoryAccounts)
+    var result = dispatcher.registerRoute(routeAccounts, factoryAccounts)
+    logger.v(LOG_TAG, "Route registered: [ $routeAccounts ][ $result ]")
 
     Thread.sleep(10000)
-    var result = dispatcher.unregisterRoute(routeCatalogs)
+    result = dispatcher.unregisterRoute(routeCatalogs)
     logger.v(LOG_TAG, "Route unregistered: [ $routeCatalogs ][ $result ]")
     result = dispatcher.unregisterRoute(routeCatalogs)
     logger.v(LOG_TAG, "Route unregistered: [ $routeCatalogs ][ $result ]")

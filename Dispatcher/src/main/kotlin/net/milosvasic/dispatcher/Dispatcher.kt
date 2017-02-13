@@ -66,11 +66,13 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
     }
 
     override fun registerRoute(route: Route, responseFactory: ResponseFactory): Boolean {
-        return responseRoutes.put(route, responseFactory) != null
+        responseRoutes.put(route, responseFactory)
+        return responseRoutes.keys.contains(route)
     }
 
     override fun registerRoute(route: Route, responseAction: ResponseAction): Boolean {
-        return actionRoutes.put(route, responseAction) != null
+        actionRoutes.put(route, responseAction)
+        return actionRoutes.keys.contains(route)
     }
 
     override fun unregisterRoute(route: Route): Boolean {
