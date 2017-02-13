@@ -48,7 +48,7 @@ fun main(args: Array<String>) {
             .addRouteElement(StaticRouteElement("users"))
             .build()
 
-    val dispatcher = Dispatcher(2507)
+    val dispatcher = Dispatcher("Dispatcher_Tryout", 2507)
     var result = dispatcher.registerRoute(root, factory)
     logger.v(LOG_TAG, "Route registered: [ $root ][ $result ]")
     result = dispatcher.registerRoute(routeUserRepos, factory)

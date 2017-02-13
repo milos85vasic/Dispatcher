@@ -22,11 +22,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
 
-class Dispatcher(port: Int) : DispatcherAbstract(port) {
+class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port) {
 
-    var logger: Logger = DispatcherLogger()
     private val LOG_TAG = Dispatcher::class
     private val running = AtomicBoolean(false)
+    var logger: Logger = DispatcherLogger(this)
     private val executor = TaskExecutor.instance(10)
     private val actionRoutes = ConcurrentHashMap<Route, ResponseAction>()
     private val responseRoutes = ConcurrentHashMap<Route, ResponseFactory>()
@@ -113,6 +113,10 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
             }
         }
         return success
+    }
+
+    override fun getName(): String {
+        return instanceName
     }
 
     private fun handleExchange(exchange: HttpExchange) {

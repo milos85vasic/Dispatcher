@@ -2,8 +2,7 @@ package net.milosvasic.dispatcher
 
 import net.milosvasic.dispatcher.route.Routing
 
-
-abstract class DispatcherAbstract(val port: Int) : Routing {
+abstract class DispatcherAbstract(port: Int) : Routing, Naming {
 
     abstract fun start()
 

@@ -1,5 +1,7 @@
 package net.milosvasic.dispatcher.logging
 
+
+import net.milosvasic.dispatcher.Naming
 import net.milosvasic.dispatcher.content.Labels
 import net.milosvasic.logger.ConsoleLogger
 import net.milosvasic.logger.FilesystemLogger
@@ -7,21 +9,10 @@ import net.milosvasic.logger.Logger
 import java.io.File
 import kotlin.reflect.KClass
 
-
-class DispatcherLogger : Logger {
+internal class DispatcherLogger(val naming: Naming) : Logger {
 
     private val logger = ConsoleLogger()
-    var logFolderName = Labels.DISPATCHER
-    private val loggerFs: FilesystemLogger
-
-    init {
-        val home = System.getProperty("user.home")
-        val root = File("$home${File.separator}$logFolderName${File.separator}Logs")
-        if (!root.exists()) {
-            root.mkdirs()
-        }
-        loggerFs = FilesystemLogger(root)
-    }
+    private val loggerFs = FilesystemLogger(getHome())
 
     override fun c(tag: KClass<*>, message: String) {
         logger.c(tag, message)
@@ -58,4 +49,20 @@ class DispatcherLogger : Logger {
         loggerFs.w(tag, message)
     }
 
+    fun getHome(): File {
+        val home = System.getProperty("user.home")
+        val builder = StringBuilder()
+                .append(home)
+                .append(File.separator)
+                .append(naming.getName())
+                .append(File.separator)
+                .append(Labels.LOGS)
+        val root = File(builder.toString())
+        if (!root.exists()) {
+            root.mkdirs()
+        }
+        return root
+    }
+
 }
+
