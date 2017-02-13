@@ -15,8 +15,6 @@ fun main(args: Array<String>) {
     val LOG_TAG = TryDispatcher::class
     val logger = ConsoleLogger()
 
-    val root = Route.Builder().addRouteElement(RootRouteElement()).build()
-
     val factory = object : ResponseFactory {
         override fun getResponse(params: HashMap<RouteElement, String>): Response {
             return Response("Executed ${Date()} [ ${params.size} ]")
