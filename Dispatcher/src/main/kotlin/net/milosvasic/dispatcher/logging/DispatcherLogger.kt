@@ -15,14 +15,12 @@ class DispatcherLogger : Logger {
     private val loggerFs: FilesystemLogger
 
     init {
-        val path = StringBuilder(File.separator)
-        path.append("var")
-        path.append(File.separator)
-        path.append("logs")
-        path.append(File.separator)
-        path.append(logFolderName)
-        val destination = File(path.toString())
-        loggerFs = FilesystemLogger(destination)
+        val home = System.getProperty("user.home")
+        val root = File("$home${File.separator}$logFolderName${File.separator}Logs")
+        if (!root.exists()) {
+            root.mkdirs()
+        }
+        loggerFs = FilesystemLogger(root)
     }
 
     override fun c(tag: KClass<*>, message: String) {
