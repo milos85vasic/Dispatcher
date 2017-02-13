@@ -6,8 +6,10 @@ import net.milosvasic.dispatcher.response.ResponseFactory
 
 interface Routing {
 
-    fun registerRoute(route: Route, responseFactory: ResponseFactory)
+    fun registerRoute(route: Route, responseFactory: ResponseFactory): Boolean
 
-    fun registerRoute(route: Route, responseAction: ResponseAction)
+    fun registerRoute(route: Route, responseAction: ResponseAction): Boolean
+
+    fun unregisterRoute(route: Route): Boolean
 
 }

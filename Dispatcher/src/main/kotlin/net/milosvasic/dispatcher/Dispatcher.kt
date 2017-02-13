@@ -64,12 +64,26 @@ class Dispatcher(port: Int) : DispatcherAbstract(port) {
         }
     }
 
-    override fun registerRoute(route: Route, responseFactory: ResponseFactory) {
-        responseRoutes.put(route, responseFactory)
+    override fun registerRoute(route: Route, responseFactory: ResponseFactory): Boolean {
+        return responseRoutes.put(route, responseFactory) != null
     }
 
-    override fun registerRoute(route: Route, responseAction: ResponseAction) {
-        actionRoutes.put(route, responseAction)
+    override fun registerRoute(route: Route, responseAction: ResponseAction): Boolean {
+        return actionRoutes.put(route, responseAction) != null
+    }
+
+    override fun unregisterRoute(route: Route): Boolean {
+        var success = false
+        if (actionRoutes.keys.contains(route)) {
+            success = actionRoutes.remove(route) != null
+        }
+        if (responseRoutes.keys.contains(route)) {
+            val result = responseRoutes.remove(route) != null
+            if (success) {
+                success = result
+            }
+        }
+        return success
     }
 
     private fun handleExchange(exchange: HttpExchange) {
