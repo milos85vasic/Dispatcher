@@ -1,6 +1,6 @@
 package net.milosvasic.dispatcher
 
-interface Naming {
+internal interface Naming {
 
     fun getName(): String
 

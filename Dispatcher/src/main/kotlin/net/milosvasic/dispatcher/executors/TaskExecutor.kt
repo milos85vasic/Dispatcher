@@ -5,7 +5,7 @@ import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-class TaskExecutor private constructor(corePoolSize: Int, maximumPoolSize: Int, queue: BlockingQueue<Runnable>) : ThreadPoolExecutor(corePoolSize, maximumPoolSize, 0, TimeUnit.MILLISECONDS, queue) {
+internal class TaskExecutor private constructor(corePoolSize: Int, maximumPoolSize: Int, queue: BlockingQueue<Runnable>) : ThreadPoolExecutor(corePoolSize, maximumPoolSize, 0, TimeUnit.MILLISECONDS, queue) {
 
     companion object {
         fun instance(capacity: Int): TaskExecutor {

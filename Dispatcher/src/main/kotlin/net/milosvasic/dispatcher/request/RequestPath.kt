@@ -3,7 +3,7 @@ package net.milosvasic.dispatcher.request
 import com.sun.net.httpserver.HttpExchange
 
 
-class RequestPath(exchange: HttpExchange) {
+internal class RequestPath(exchange: HttpExchange) {
 
     val value: String
 

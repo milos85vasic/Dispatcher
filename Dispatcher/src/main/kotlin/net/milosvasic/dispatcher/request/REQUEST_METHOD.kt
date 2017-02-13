@@ -1,7 +1,7 @@
 package net.milosvasic.dispatcher.request
 
 
-object REQUEST_METHOD {
+internal object REQUEST_METHOD {
     val GET = "GET"
     val POST = "POST"
     val PUT = "PUT"

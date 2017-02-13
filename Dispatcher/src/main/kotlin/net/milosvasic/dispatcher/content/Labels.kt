@@ -1,6 +1,6 @@
 package net.milosvasic.dispatcher.content
 
-object Labels {
+internal object Labels {
     val LOGS = "Logs"
     val ROUTE = "Route"
     val REGISTER = "Register"

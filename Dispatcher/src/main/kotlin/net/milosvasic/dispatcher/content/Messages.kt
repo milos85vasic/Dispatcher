@@ -1,7 +1,7 @@
 package net.milosvasic.dispatcher.content
 
 
-object Messages {
+internal object Messages {
 
     val OK = "OK"
     val ERROR_404 = "Not found."

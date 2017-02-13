@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
 
-class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port) {
+class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceName, port) {
 
     private val LOG_TAG = Dispatcher::class
     private val running = AtomicBoolean(false)
