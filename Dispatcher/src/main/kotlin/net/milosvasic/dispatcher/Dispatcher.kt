@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import net.milosvasic.dispatcher.content.Messages
 import net.milosvasic.dispatcher.executors.TaskExecutor
+import net.milosvasic.dispatcher.logging.DispatcherLogger
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
 import net.milosvasic.dispatcher.response.ResponseAction
@@ -13,7 +14,7 @@ import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.RouteElement
 import net.milosvasic.dispatcher.route.exception.RouteUnregisterException
-import net.milosvasic.logger.ConsoleLogger
+import net.milosvasic.logger.Logger
 import java.net.InetSocketAddress
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -23,7 +24,7 @@ import java.util.regex.Pattern
 
 class Dispatcher(port: Int) : DispatcherAbstract(port) {
 
-    private val logger = ConsoleLogger()
+    var logger: Logger = DispatcherLogger()
     private val LOG_TAG = Dispatcher::class
     private val running = AtomicBoolean(false)
     private val executor = TaskExecutor.instance(10)
