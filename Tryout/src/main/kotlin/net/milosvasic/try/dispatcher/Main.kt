@@ -49,12 +49,18 @@ fun main(args: Array<String>) {
             .build()
 
     val dispatcher = Dispatcher(2507)
-    dispatcher.registerRoute(root, factory)
-    dispatcher.registerRoute(routeUserRepos, factory)
-    dispatcher.registerRoute(routeAllRepos, factory)
-    dispatcher.registerRoute(routeAllUsers, factory)
-    dispatcher.registerRoute(routeAllUsers, action) // We registered action for user route too!
-    dispatcher.registerRoute(routeCatalogs, factory)
+    var result = dispatcher.registerRoute(root, factory)
+    logger.v(LOG_TAG, "Route registered: [ $root ][ $result ]")
+    result = dispatcher.registerRoute(routeUserRepos, factory)
+    logger.v(LOG_TAG, "Route registered: [ $routeUserRepos ][ $result ]")
+    result = dispatcher.registerRoute(routeAllRepos, factory)
+    logger.v(LOG_TAG, "Route registered: [ $routeAllRepos ][ $result ]")
+    result = dispatcher.registerRoute(routeAllUsers, factory)
+    logger.v(LOG_TAG, "Route registered: [ $routeAllUsers ][ $result ]")
+    result = dispatcher.registerRoute(routeAllUsers, action) // We registered action for user route too!
+    logger.v(LOG_TAG, "Action route registered: [ $routeAllUsers ][ $result ]")
+    result = dispatcher.registerRoute(routeCatalogs, factory)
+    logger.v(LOG_TAG, "Route registered: [ $routeCatalogs ][ $result ]")
 
     try {
         dispatcher.start()
@@ -104,7 +110,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    var result = dispatcher.registerRoute(routeAccounts, factoryAccounts)
+    result = dispatcher.registerRoute(routeAccounts, factoryAccounts)
     logger.v(LOG_TAG, "Route registered: [ $routeAccounts ][ $result ]")
 
     Thread.sleep(10000)
