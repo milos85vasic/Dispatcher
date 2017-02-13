@@ -104,6 +104,8 @@ fun main(args: Array<String>) {
     }
 
     dispatcher.registerRoute(routeAccounts, factoryAccounts)
+    dispatcher.registerRoute(routeAccounts, factoryAccounts)
+    dispatcher.registerRoute(routeAccounts, factoryAccounts) // Trying warn logs
 
     Thread.sleep(10000)
     dispatcher.unregisterRoute(routeCatalogs)

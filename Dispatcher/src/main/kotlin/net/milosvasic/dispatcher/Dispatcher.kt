@@ -70,10 +70,11 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
     override fun registerRoute(route: Route, responseFactory: ResponseFactory): Boolean {
         responseRoutes.put(route, responseFactory)
         val result = responseRoutes.keys.contains(route)
+        val message = "${Labels.ROUTE} [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ][ ${Labels.RESPONSE_FACTORY} ]"
         if (result) {
-            logger.i(LOG_TAG, "Route with response [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+            logger.i(LOG_TAG, message)
         } else {
-            logger.w(LOG_TAG, "Route with response [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+            logger.w(LOG_TAG, message)
         }
         return result
     }
@@ -81,10 +82,11 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
     override fun registerRoute(route: Route, responseAction: ResponseAction): Boolean {
         actionRoutes.put(route, responseAction)
         val result = actionRoutes.keys.contains(route)
+        val message = "${Labels.ROUTE} [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ][ ${Labels.RESPONSE_ACTION} ]"
         if (result) {
-            logger.i(LOG_TAG, "Route with action [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+            logger.i(LOG_TAG, message)
         } else {
-            logger.w(LOG_TAG, "Route with action [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ]")
+            logger.w(LOG_TAG, message)
         }
         return result
     }
@@ -103,7 +105,7 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
                 throw RouteUnregisterException()
             }
         }
-        logger.i(LOG_TAG, "Route [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ]")
+        logger.i(LOG_TAG, "${Labels.ROUTE} [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ]")
         return success
     }
 
@@ -115,7 +117,8 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
                 throw RouteUnregisterException()
             }
         }
-        logger.i(LOG_TAG, "Route with response [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ]")
+        val message = "${Labels.ROUTE}  [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ][ ${Labels.RESPONSE_FACTORY} ]"
+        logger.i(LOG_TAG, message)
         return success
     }
 
@@ -127,7 +130,8 @@ class Dispatcher(val instanceName: String, port: Int) : DispatcherAbstract(port)
                 throw RouteUnregisterException()
             }
         }
-        logger.i(LOG_TAG, "Route with action [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ]")
+        val message = "${Labels.ROUTE} [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ][ ${Labels.RESPONSE_ACTION} ]"
+        logger.i(LOG_TAG, message)
         return success
     }
 
