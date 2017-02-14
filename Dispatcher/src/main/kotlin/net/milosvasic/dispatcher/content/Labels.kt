@@ -3,6 +3,7 @@ package net.milosvasic.dispatcher.content
 internal object Labels {
     val LOGS = "Logs"
     val ROUTE = "Route"
+    val ERROR = "Error"
     val REGISTER = "Register"
     val DISPATCHER = "Dispatcher"
     val UNREGISTER = "Unregister"

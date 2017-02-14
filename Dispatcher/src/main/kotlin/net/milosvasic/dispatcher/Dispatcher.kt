@@ -16,6 +16,8 @@ import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.RouteElement
 import net.milosvasic.dispatcher.route.exception.RouteUnregisterException
 import net.milosvasic.logger.Logger
+import java.io.BufferedOutputStream
+import java.io.ByteArrayInputStream
 import java.net.InetSocketAddress
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -156,13 +158,17 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
                         code = 200
                         response = Messages.OK
                     }
-                    exchange.sendResponseHeaders(code, response.length.toLong())
-                    sendResponse(exchange, response)
+                    exchange.sendResponseHeaders(code, 0)
+                    try {
+                        sendResponse(exchange, response)
+                    } catch (e: Exception) {
+                        logger.e(LOG_TAG, "${Labels.ERROR}: $e")
+                    }
                     actionRoutes[route]?.onAction()
                 } else {
                     code = 404
                     response = Messages.ERROR_404
-                    exchange.sendResponseHeaders(code, response.length.toLong())
+                    exchange.sendResponseHeaders(code, 0)
                     sendResponse(exchange, response)
                 }
                 logger.v(LOG_TAG, "<<< [ $code ] ${exchange.requestURI}")
@@ -234,8 +240,18 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
 
     private fun sendResponse(exchange: HttpExchange, response: String) {
         val os = exchange.responseBody
-        os?.write(response.toByteArray())
-        os?.close()
+        val input = ByteArrayInputStream(response.toByteArray())
+        val bufferedOutput = BufferedOutputStream(os)
+        val buffer = ByteArray(64 * 1024)
+        while (true) {
+            val data = input.read(buffer)
+            if (data <= 0) {
+                break
+            }
+            bufferedOutput.write(buffer)
+        }
+        bufferedOutput.flush()
+        bufferedOutput.close()
     }
 
 }
