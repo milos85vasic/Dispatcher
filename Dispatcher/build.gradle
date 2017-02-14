@@ -29,10 +29,10 @@ dependencies {
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 
-    compile files("libs/Logger_V1.1.0.jar")
+    compile files("libs/Logger_V1.1.1.jar")
 }
 
-int alpha = 2
+int alpha = 3
 int versionNumber = 1
 int secondaryVersion = 0
 int tertiaryVersion = 0
