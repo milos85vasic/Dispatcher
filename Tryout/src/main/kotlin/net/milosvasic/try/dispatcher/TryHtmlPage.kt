@@ -36,7 +36,7 @@ fun main(args: Array<String>) {
                 line = bufferedReader.readLine()
             }
             val content = builder.toString()
-            logger.v(LOG_TAG, content)
+//            logger.v(LOG_TAG, content)
             return Response(content)
         }
     }

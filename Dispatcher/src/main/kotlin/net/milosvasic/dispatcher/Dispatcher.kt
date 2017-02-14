@@ -51,7 +51,7 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         if (!running.get()) {
             server.start()
             running.set(true)
-            logger.d(LOG_TAG, Messages.DISPATCHER_RUNNING)
+            logger.c(LOG_TAG, Messages.DISPATCHER_RUNNING)
         } else {
             throw IllegalStateException(Messages.DISPATCHER_ALREADY_RUNNING)
         }
@@ -61,7 +61,7 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         if (running.get()) {
             server.stop(0)
             running.set(false)
-            logger.d(LOG_TAG, Messages.DISPATCHER_TERMINATED)
+            logger.c(LOG_TAG, Messages.DISPATCHER_TERMINATED)
         } else {
             throw IllegalStateException(Messages.DISPATCHER_NOT_RUNNING)
         }
