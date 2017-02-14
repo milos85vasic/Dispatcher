@@ -51,7 +51,7 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         if (!running.get()) {
             server.start()
             running.set(true)
-            logger.v(LOG_TAG, Messages.DISPATCHER_RUNNING)
+            logger.d(LOG_TAG, Messages.DISPATCHER_RUNNING)
         } else {
             throw IllegalStateException(Messages.DISPATCHER_ALREADY_RUNNING)
         }
