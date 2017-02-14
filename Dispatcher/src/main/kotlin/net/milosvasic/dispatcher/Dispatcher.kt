@@ -243,18 +243,24 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         val bytes = response.toByteArray()
         val input = ByteArrayInputStream(bytes)
         val bufferedOutput = BufferedOutputStream(output)
-        var bufferSize = 64 * 1024
-        if (bytes.size < bufferSize) {
-            bufferSize = bytes.size
-        }
-        val buffer = ByteArray(bufferSize)
-        while (true) {
-            val data = input.read(buffer)
-            if (data <= 0) {
-                break
+
+        var sent = 0
+        fun getBuffer(): ByteArray {
+            var bufferSize = 1024
+            if (bytes.size - sent < bufferSize) {
+                bufferSize = bytes.size
             }
-            bufferedOutput.write(buffer)
+            return ByteArray(bufferSize)
         }
+
+        var buffer = getBuffer()
+        while (sent < bytes.size) {
+            val data = input.read(buffer)
+            bufferedOutput.write(buffer)
+            sent += data
+            buffer = getBuffer()
+        }
+
         bufferedOutput.flush()
         bufferedOutput.close()
     }
