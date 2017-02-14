@@ -239,10 +239,15 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
     }
 
     private fun sendResponse(exchange: HttpExchange, response: String) {
-        val os = exchange.responseBody
-        val input = ByteArrayInputStream(response.toByteArray())
-        val bufferedOutput = BufferedOutputStream(os)
-        val buffer = ByteArray(64 * 1024)
+        val output = exchange.responseBody
+        val bytes = response.toByteArray()
+        val input = ByteArrayInputStream(bytes)
+        val bufferedOutput = BufferedOutputStream(output)
+        var bufferSize = 64 * 1024
+        if (bytes.size < bufferSize) {
+            bufferSize = bytes.size
+        }
+        val buffer = ByteArray(bufferSize)
         while (true) {
             val data = input.read(buffer)
             if (data <= 0) {
