@@ -71,7 +71,7 @@ fun main(args: Array<String>) {
 
     val faviconResponse = object : AssetFactory {
         override fun getContent(params: HashMap<RouteElement, String>): Asset {
-            val assetName = params[faviconStaticRoute]
+            val assetName = faviconStaticRoute.name
             val input = javaClass.classLoader.getResourceAsStream(assetName)
             return Asset(getBytes(input), 200)
         }

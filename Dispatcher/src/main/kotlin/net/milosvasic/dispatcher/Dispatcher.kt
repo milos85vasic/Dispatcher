@@ -9,8 +9,8 @@ import net.milosvasic.dispatcher.executors.TaskExecutor
 import net.milosvasic.dispatcher.logging.DispatcherLogger
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
-import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.AssetFactory
+import net.milosvasic.dispatcher.response.ResponseAction
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.AssetsRoute
 import net.milosvasic.dispatcher.route.DynamicRouteElement
@@ -176,30 +176,32 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
                 val route = getRoute(exchange)
                 if (route != null) {
                     val params = getParams(route, RequestPath(exchange))
-                    val routeResponse = responseRoutes[route]?.getResponse(params)
-                    val assetResponse = assetRoutes[route]?.getContent(params)
+                    val routeResponse = responseRoutes[route]
+                    val assetResponse = assetRoutes[route]
                     if (routeResponse != null) {
-                        exchange.sendResponseHeaders(routeResponse.code, 0)
+                        val response = routeResponse.getResponse(params)
+                        exchange.sendResponseHeaders(response.code, 0)
                         try {
-                            sendResponse(exchange, routeResponse.content)
+                            sendResponse(exchange, response.content)
                         } catch (e: Exception) {
                             logger.e(LOG_TAG, "${Labels.ERROR}: $e")
                         }
                     } else if (assetResponse != null) {
-                            exchange.sendResponseHeaders(assetResponse.code, 0)
-                            try {
-                                sendResponse(exchange, assetResponse.content)
-                            } catch (e: Exception) {
-                                logger.e(LOG_TAG, "${Labels.ERROR}: $e")
-                            }
-                        } else {
-                            exchange.sendResponseHeaders(200, 0)
-                            try {
-                                sendResponse(exchange, Messages.OK)
-                            } catch (e: Exception) {
-                                logger.e(LOG_TAG, "${Labels.ERROR}: $e")
-                            }
+                        val response = assetResponse.getContent(params)
+                        exchange.sendResponseHeaders(response.code, 0)
+                        try {
+                            sendResponse(exchange, response.content)
+                        } catch (e: Exception) {
+                            logger.e(LOG_TAG, "${Labels.ERROR}: $e")
                         }
+                    } else {
+                        exchange.sendResponseHeaders(200, 0)
+                        try {
+                            sendResponse(exchange, Messages.OK)
+                        } catch (e: Exception) {
+                            logger.e(LOG_TAG, "${Labels.ERROR}: $e")
+                        }
+                    }
                     actionRoutes[route]?.onAction()
                 } else {
                     exchange.sendResponseHeaders(404, 0)
