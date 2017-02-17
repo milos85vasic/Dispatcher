@@ -311,6 +311,7 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         bufferedOutput.flush()
         bufferedOutput.close()
         input.close()
+        output.close()
     }
 
 }
