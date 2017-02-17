@@ -18,7 +18,6 @@ import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.RouteElement
 import net.milosvasic.dispatcher.route.exception.RouteUnregisterException
 import net.milosvasic.logger.Logger
-import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.net.InetSocketAddress
 import java.util.*
@@ -289,27 +288,31 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
     private fun sendResponse(exchange: HttpExchange, bytes: ByteArray) {
         val output = exchange.responseBody
         val input = ByteArrayInputStream(bytes)
-        val bufferedOutput = BufferedOutputStream(output)
-
-        var sent = 0
-        fun getBuffer(): ByteArray {
-            var bufferSize = 1024
-            if (bytes.size - sent < bufferSize) {
-                bufferSize = bytes.size
-            }
-            return ByteArray(bufferSize)
-        }
-
-        var buffer = getBuffer()
-        while (sent < bytes.size) {
-            val data = input.read(buffer)
-            bufferedOutput.write(buffer)
-            sent += data
-            buffer = getBuffer()
-        }
-
-        bufferedOutput.flush()
-        bufferedOutput.close()
+//        val bufferedOutput = BufferedOutputStream(output)
+//
+//        var sent = 0
+//        fun getBuffer(): ByteArray {
+//            var bufferSize = 1024
+//            if (bytes.size - sent < bufferSize) {
+//                bufferSize = bytes.size
+//            }
+//            return ByteArray(bufferSize)
+//        }
+//
+//        var buffer = getBuffer()
+//        while (sent < bytes.size) {
+//            val data = input.read(buffer)
+//            bufferedOutput.write(buffer)
+//            sent += data
+//            buffer = getBuffer()
+//        }
+//
+//        bufferedOutput.flush()
+//        bufferedOutput.close()
+//        input.close()
+//        output.close()
+//
+        input.copyTo(output)
         input.close()
         output.close()
     }
