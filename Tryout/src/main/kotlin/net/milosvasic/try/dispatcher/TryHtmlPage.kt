@@ -19,8 +19,8 @@ fun main(args: Array<String>) {
     val logger = ConsoleLogger()
     val TAG = TryHtmlPage::class
 
-    fun getBytes(input: InputStream): ByteArray {
-        return input.readBytes()
+    fun getBytes(input: InputStream?): ByteArray? {
+        return input?.readBytes()
     }
 
     fun getResponse(input: InputStream?): String {
@@ -88,7 +88,7 @@ fun main(args: Array<String>) {
         override fun getContent(params: HashMap<RouteElement, String>): Asset {
             val assetName = faviconStaticRoute.name
             val input = javaClass.classLoader.getResourceAsStream(assetName)
-            return Asset(getBytes(input), 200)
+            return Asset(getBytes(input))
         }
     }
 

@@ -1,3 +1,9 @@
 package net.milosvasic.dispatcher.response
 
-data class Response(val content: String, val code: Int = 200)
+class Response(content: String, code: Int = 200) : ResponseAbstract<String>(content, code) {
+
+    override fun getBytes(): ByteArray? {
+        return content.toByteArray()
+    }
+
+}

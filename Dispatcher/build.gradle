@@ -32,7 +32,7 @@ dependencies {
     compile files("libs/Logger_V1.1.1.jar")
 }
 
-int alpha = 5
+int alpha = 6
 int versionNumber = 1
 int secondaryVersion = 0
 int tertiaryVersion = 0

@@ -9,9 +9,7 @@ import net.milosvasic.dispatcher.executors.TaskExecutor
 import net.milosvasic.dispatcher.logging.DispatcherLogger
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
-import net.milosvasic.dispatcher.response.AssetFactory
-import net.milosvasic.dispatcher.response.ResponseAction
-import net.milosvasic.dispatcher.response.ResponseFactory
+import net.milosvasic.dispatcher.response.*
 import net.milosvasic.dispatcher.route.AssetsRoute
 import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route
@@ -179,39 +177,31 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
                     val assetResponse = assetRoutes[route]
                     if (routeResponse != null) {
                         val response = routeResponse.getResponse(params)
-                        exchange.sendResponseHeaders(response.code, 0)
                         try {
-                            sendResponse(exchange, response.content)
+                            sendResponse(exchange, response)
                         } catch (e: Exception) {
                             logger.e(LOG_TAG, "${Labels.ERROR}: $e")
                         }
                     } else if (assetResponse != null) {
                         val response = assetResponse.getContent(params)
-                        exchange.sendResponseHeaders(response.code, 0)
                         try {
-                            sendResponse(exchange, response.content)
+                            sendResponse(exchange, response)
                         } catch (e: Exception) {
                             logger.e(LOG_TAG, "${Labels.ERROR}: $e")
                         }
                     } else {
-                        exchange.sendResponseHeaders(200, 0)
-                        try {
-                            sendResponse(exchange, Messages.OK)
-                        } catch (e: Exception) {
-                            logger.e(LOG_TAG, "${Labels.ERROR}: $e")
-                        }
+                        confirmation(exchange)
                     }
                     actionRoutes[route]?.onAction()
                 } else {
-                    exchange.sendResponseHeaders(404, 0)
-                    sendResponse(exchange, Messages.ERROR_404)
+                    error_404(exchange)
                 }
                 val code = exchange.responseCode
                 logger.v(LOG_TAG, "<<< [ $code ] ${exchange.requestURI}")
             }
             else -> {
-                val response = "${Messages.METHOD_NOT_SUPPORTED} Method [ ${exchange.requestMethod} ]"
-                exchange.sendResponseHeaders(501, response.length.toLong())
+                val message = "${Messages.METHOD_NOT_SUPPORTED} Method [ ${exchange.requestMethod} ]"
+                val response = Response(message, 501)
                 sendResponse(exchange, response)
             }
         }
@@ -280,38 +270,33 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         return false
     }
 
-    private fun sendResponse(exchange: HttpExchange, response: String) {
-        val bytes = response.toByteArray()
-        sendResponse(exchange, bytes)
+    private fun sendResponse(exchange: HttpExchange, response: ResponseAbstract<*>) {
+        val bytes = response.getBytes()
+        if (bytes == null || bytes.isEmpty()) {
+            error_404(exchange)
+        } else {
+            exchange.sendResponseHeaders(response.code, 0)
+            val output = exchange.responseBody
+            val input = ByteArrayInputStream(bytes)
+            input.copyTo(output)
+            input.close()
+            output.close()
+        }
     }
 
-    private fun sendResponse(exchange: HttpExchange, bytes: ByteArray) {
+    private fun error_404(exchange: HttpExchange) {
+        exchange.sendResponseHeaders(404, 0)
         val output = exchange.responseBody
-        val input = ByteArrayInputStream(bytes)
-//        val bufferedOutput = BufferedOutputStream(output)
-//
-//        var sent = 0
-//        fun getBuffer(): ByteArray {
-//            var bufferSize = 1024
-//            if (bytes.size - sent < bufferSize) {
-//                bufferSize = bytes.size
-//            }
-//            return ByteArray(bufferSize)
-//        }
-//
-//        var buffer = getBuffer()
-//        while (sent < bytes.size) {
-//            val data = input.read(buffer)
-//            bufferedOutput.write(buffer)
-//            sent += data
-//            buffer = getBuffer()
-//        }
-//
-//        bufferedOutput.flush()
-//        bufferedOutput.close()
-//        input.close()
-//        output.close()
-//
+        val input = ByteArrayInputStream(Messages.ERROR_404.toByteArray())
+        input.copyTo(output)
+        input.close()
+        output.close()
+    }
+
+    private fun confirmation(exchange: HttpExchange) {
+        exchange.sendResponseHeaders(200, 0)
+        val output = exchange.responseBody
+        val input = ByteArrayInputStream(Messages.OK.toByteArray())
         input.copyTo(output)
         input.close()
         output.close()

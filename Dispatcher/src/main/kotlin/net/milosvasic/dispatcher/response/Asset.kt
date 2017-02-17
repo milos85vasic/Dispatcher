@@ -1,4 +1,10 @@
 package net.milosvasic.dispatcher.response
 
 
-class Asset(val content: ByteArray, val code: Int = 200)
+class Asset(content: ByteArray?, code: Int = 200) : ResponseAbstract<ByteArray?>(content, code) {
+
+    override fun getBytes(): ByteArray? {
+        return content
+    }
+
+}
