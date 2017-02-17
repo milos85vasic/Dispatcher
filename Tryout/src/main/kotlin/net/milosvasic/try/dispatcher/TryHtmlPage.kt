@@ -8,7 +8,6 @@ import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.*
 import net.milosvasic.logger.ConsoleLogger
 import java.io.BufferedReader
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.*
@@ -21,19 +20,7 @@ fun main(args: Array<String>) {
     val TAG = TryHtmlPage::class
 
     fun getBytes(input: InputStream): ByteArray {
-        logger.v(TAG, "-- SENDING.")
-        val available = input.available()
-        val buffer = ByteArray(available)
-        var sent = 0
-        while (sent < available) {
-            val read = input.read(buffer, 0, buffer.size)
-            sent += read
-            //            val s = String(data)
-            //            logger.v(TAG, "[ $available ][ $sent ][ $s ]")
-        }
-        input.close()
-        logger.v(TAG, "-- SENT.")
-        return buffer
+        return input.readBytes()
     }
 
     fun getResponse(input: InputStream?): String {

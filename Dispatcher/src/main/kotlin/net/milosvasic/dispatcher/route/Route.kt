@@ -16,7 +16,7 @@ open class Route protected constructor() {
                     builder.append("/(${element.name})")
                 }
                 is DynamicRouteElement -> {
-                    builder.append("/(.+?)")
+                    builder.append("/([\\w.]+)")
                 }
             }
         }
