@@ -287,6 +287,8 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
     }
 
     private fun sendResponse(exchange: HttpExchange, bytes: ByteArray) {
+        logger.v(LOG_TAG, "--- SENDING.")
+        exchange.responseHeaders["Content-Type"] = "text/html; charset=UTF-8"
         val output = exchange.responseBody
         val input = ByteArrayInputStream(bytes)
         val bufferedOutput = BufferedOutputStream(output)
@@ -310,6 +312,8 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
 
         bufferedOutput.flush()
         bufferedOutput.close()
+        input.close()
+        logger.v(LOG_TAG, "--- SENT.")
     }
 
 }
