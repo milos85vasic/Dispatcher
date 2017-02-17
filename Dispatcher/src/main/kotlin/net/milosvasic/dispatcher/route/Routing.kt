@@ -1,7 +1,7 @@
 package net.milosvasic.dispatcher.route
 
 import net.milosvasic.dispatcher.response.ResponseAction
-import net.milosvasic.dispatcher.response.ResponseAsset
+import net.milosvasic.dispatcher.response.AssetFactory
 import net.milosvasic.dispatcher.response.ResponseFactory
 
 
@@ -11,7 +11,7 @@ internal interface Routing {
 
     fun registerRoute(route: Route, responseAction: ResponseAction): Boolean
 
-    fun registerRoute(route: AssetsRoute, responseAsset: ResponseAsset): Boolean
+    fun registerRoute(route: AssetsRoute, assetFactory: AssetFactory): Boolean
 
     fun unregisterRoute(route: Route): Boolean
 
@@ -19,6 +19,6 @@ internal interface Routing {
 
     fun unregisterRoute(route: Route, responseFactory: ResponseFactory): Boolean
 
-    fun unregisterRoute(route: AssetsRoute, responseAsset: ResponseAsset): Boolean
+    fun unregisterRoute(route: AssetsRoute, assetFactory: AssetFactory): Boolean
 
 }

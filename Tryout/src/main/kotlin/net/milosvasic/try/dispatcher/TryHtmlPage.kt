@@ -1,8 +1,9 @@
 package net.milosvasic.`try`.dispatcher
 
 import net.milosvasic.dispatcher.Dispatcher
+import net.milosvasic.dispatcher.response.Asset
 import net.milosvasic.dispatcher.response.Response
-import net.milosvasic.dispatcher.response.ResponseAsset
+import net.milosvasic.dispatcher.response.AssetFactory
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.*
 import java.io.BufferedReader
@@ -48,34 +49,37 @@ fun main(args: Array<String>) {
         }
     }
 
-    val assetsFolder = StaticRouteElement("Assets")
+    val assetsFolder = DynamicRouteElement("Asset")
     val assets = AssetsRoute.Builder()
+            .addRouteElement(StaticRouteElement("Assets"))
+            .addRouteElement(StaticRouteElement("Js"))
             .addRouteElement(assetsFolder)
-            .addRouteElement(DynamicRouteElement("Asset"))
             .build()
+
+    val assetsResponse = object : AssetFactory {
+        override fun getContent(params: HashMap<RouteElement, String>): Asset {
+            val assetName = params[assetsFolder]
+            val input = javaClass.classLoader.getResourceAsStream("Assets/$assetName")
+            return Asset(getBytes(input), 200)
+        }
+    }
 
     val faviconStaticRoute = StaticRouteElement("favicon.ico")
     val favicon = AssetsRoute.Builder()
             .addRouteElement(faviconStaticRoute)
             .build()
 
-    dispatcher.registerRoute(rootRoute, homepage)
-    dispatcher.registerRoute(assets, object : ResponseAsset {
-        override fun getContent(params: HashMap<RouteElement, String>): ByteArray {
-            val assetName = params[assetsFolder]
-            val input = javaClass.classLoader.getResourceAsStream("Assets/$assetName")
-            return getBytes(input)
-        }
-    })
-    dispatcher.registerRoute(favicon, object : ResponseAsset {
-        override fun getContent(params: HashMap<RouteElement, String>): ByteArray {
+    val faviconResponse = object : AssetFactory {
+        override fun getContent(params: HashMap<RouteElement, String>): Asset {
             val assetName = params[faviconStaticRoute]
             val input = javaClass.classLoader.getResourceAsStream(assetName)
-            return getBytes(input)
+            return Asset(getBytes(input), 200)
         }
-    })
+    }
 
+    dispatcher.registerRoute(rootRoute, homepage)
+    dispatcher.registerRoute(assets, assetsResponse)
+    dispatcher.registerRoute(favicon, faviconResponse)
     dispatcher.start()
-
 
 }

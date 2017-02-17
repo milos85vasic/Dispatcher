@@ -4,8 +4,8 @@ import net.milosvasic.dispatcher.route.RouteElement
 import java.util.*
 
 
-interface ResponseAsset {
+interface AssetFactory {
 
-    fun getContent(params: HashMap<RouteElement, String>): ByteArray
+    fun getContent(params: HashMap<RouteElement, String>): Asset
 
 }

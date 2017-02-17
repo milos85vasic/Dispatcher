@@ -10,7 +10,7 @@ import net.milosvasic.dispatcher.logging.DispatcherLogger
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
 import net.milosvasic.dispatcher.response.ResponseAction
-import net.milosvasic.dispatcher.response.ResponseAsset
+import net.milosvasic.dispatcher.response.AssetFactory
 import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.route.AssetsRoute
 import net.milosvasic.dispatcher.route.DynamicRouteElement
@@ -34,8 +34,8 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
     var logger: Logger = DispatcherLogger(this)
     private val executor = TaskExecutor.instance(10)
     private val actionRoutes = ConcurrentHashMap<Route, ResponseAction>()
+    private val assetRoutes = ConcurrentHashMap<AssetsRoute, AssetFactory>()
     private val responseRoutes = ConcurrentHashMap<Route, ResponseFactory>()
-    private val assetRoutes = ConcurrentHashMap<AssetsRoute, ResponseAsset>()
     private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
 
     private val hook = Thread(Runnable {
@@ -96,8 +96,8 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         return result
     }
 
-    override fun registerRoute(route: AssetsRoute, responseAsset: ResponseAsset): Boolean {
-        assetRoutes.put(route, responseAsset)
+    override fun registerRoute(route: AssetsRoute, assetFactory: AssetFactory): Boolean {
+        assetRoutes.put(route, assetFactory)
         val result = assetRoutes.keys.contains(route)
         val message = "${Labels.ROUTE} [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ][ ${Labels.RESPONSE_ASSET} ]"
         if (result) {
@@ -152,10 +152,10 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         return success
     }
 
-    override fun unregisterRoute(route: AssetsRoute, responseAsset: ResponseAsset): Boolean {
+    override fun unregisterRoute(route: AssetsRoute, assetFactory: AssetFactory): Boolean {
         var success = false
         if (assetRoutes.keys.contains(route)) {
-            success = assetRoutes.remove(route, responseAsset)
+            success = assetRoutes.remove(route, assetFactory)
             if (!success) {
                 throw RouteUnregisterException()
             }
@@ -173,32 +173,39 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         logger.v(LOG_TAG, ">>> [ ${exchange.requestMethod} ] ${exchange.requestURI}")
         when (exchange.requestMethod) {
             REQUEST_METHOD.GET -> {
-                val code: Int
-                val response: String
                 val route = getRoute(exchange)
                 if (route != null) {
                     val params = getParams(route, RequestPath(exchange))
                     val routeResponse = responseRoutes[route]?.getResponse(params)
+                    val assetResponse = assetRoutes[route]?.getContent(params)
                     if (routeResponse != null) {
-                        code = routeResponse.code
-                        response = routeResponse.content
-                    } else {
-                        code = 200
-                        response = Messages.OK
-                    }
-                    exchange.sendResponseHeaders(code, 0)
-                    try {
-                        sendResponse(exchange, response)
-                    } catch (e: Exception) {
-                        logger.e(LOG_TAG, "${Labels.ERROR}: $e")
-                    }
+                        exchange.sendResponseHeaders(routeResponse.code, 0)
+                        try {
+                            sendResponse(exchange, routeResponse.content)
+                        } catch (e: Exception) {
+                            logger.e(LOG_TAG, "${Labels.ERROR}: $e")
+                        }
+                    } else if (assetResponse != null) {
+                            exchange.sendResponseHeaders(assetResponse.code, 0)
+                            try {
+                                sendResponse(exchange, assetResponse.content)
+                            } catch (e: Exception) {
+                                logger.e(LOG_TAG, "${Labels.ERROR}: $e")
+                            }
+                        } else {
+                            exchange.sendResponseHeaders(200, 0)
+                            try {
+                                sendResponse(exchange, Messages.OK)
+                            } catch (e: Exception) {
+                                logger.e(LOG_TAG, "${Labels.ERROR}: $e")
+                            }
+                        }
                     actionRoutes[route]?.onAction()
                 } else {
-                    code = 404
-                    response = Messages.ERROR_404
-                    exchange.sendResponseHeaders(code, 0)
-                    sendResponse(exchange, response)
+                    exchange.sendResponseHeaders(404, 0)
+                    sendResponse(exchange, Messages.ERROR_404)
                 }
+                val code = exchange.responseCode
                 logger.v(LOG_TAG, "<<< [ $code ] ${exchange.requestURI}")
             }
             else -> {
@@ -211,7 +218,7 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
 
     private fun getRoute(exchange: HttpExchange): Route? {
         val routesSet = LinkedHashSet<Route>()
-        if (!responseRoutes.isEmpty() || !actionRoutes.isEmpty()) {
+        if (!responseRoutes.isEmpty() || !actionRoutes.isEmpty() || !assetRoutes.isEmpty()) {
             val path = RequestPath(exchange)
 
             val responseRoutesSet = responseRoutes.keys
@@ -222,10 +229,16 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
                     .filter { matchRoute(it, path.value) }
                     .toSet()
 
+            val assetsRoutesSet = assetRoutes.keys
+                    .filter { matchRoute(it, path.value) }
+                    .toSet()
+
             routesSet.addAll(actionRoutesSet)
             routesSet.addAll(responseRoutesSet)
+            routesSet.addAll(assetsRoutesSet)
 
             if (actionRoutesSet.size > 1) logger.w(LOG_TAG, Messages.ACTION_ROUTES_SHADOWING)
+            if (assetsRoutesSet.size > 1) logger.w(LOG_TAG, Messages.ASSETS_ROUTES_SHADOWING)
             if (responseRoutesSet.size > 1) logger.w(LOG_TAG, Messages.RESPONSE_ROUTES_SHADOWING)
         }
         if (!routesSet.isEmpty()) {
@@ -267,8 +280,12 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
     }
 
     private fun sendResponse(exchange: HttpExchange, response: String) {
-        val output = exchange.responseBody
         val bytes = response.toByteArray()
+        sendResponse(exchange, bytes)
+    }
+
+    private fun sendResponse(exchange: HttpExchange, bytes: ByteArray) {
+        val output = exchange.responseBody
         val input = ByteArrayInputStream(bytes)
         val bufferedOutput = BufferedOutputStream(output)
 
