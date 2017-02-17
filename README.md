@@ -8,7 +8,9 @@ Library is currently in the phase of development.
 
 ## What is supported?
 
-Library supports http get as a mechanism to request something or to trigger an action.
+- Library supports http GET as a mechanism to request something or to trigger an action.
+- Static and dynamic routes
+- Routes for assets (static and dynamic)
 
 ## How to use it?
 - Import:
@@ -106,6 +108,60 @@ val routeAllUsers = Route.Builder()
     
 // And register action to be triggered by the route:
 dispatcher.registerRoute(routeAllUsers, action)
+```
+- Define assets routes:
+```
+// Dynanamic part of the route (for example: filename.gif)
+val assetsFolder = DynamicRouteElement("Asset")
+
+// Deining route: /Assets/{Asset}
+val assets = AssetsRoute.Builder()
+        .addRouteElement(StaticRouteElement("Assets"))
+        .addRouteElement(assetsFolder)
+        .build()
+
+// Deining route: /Assets/Js/{Asset}
+val assetsJs = AssetsRoute.Builder()
+        .addRouteElement(StaticRouteElement("Assets"))
+        .addRouteElement(StaticRouteElement("Js"))
+        .addRouteElement(assetsFolder)
+        .build()
+        
+// Assets static route for favicon
+val faviconStaticRoute = StaticRouteElement("favicon.ico")
+val favicon = AssetsRoute.Builder()
+        .addRouteElement(faviconStaticRoute)
+        .build()
+
+// Define factories to get bytes for the assets:
+val assetsJsResponse = object : AssetFactory {
+    override fun getContent(params: HashMap<RouteElement, String>): Asset {
+        val assetName = params[assetsFolder]
+        val input = javaClass.classLoader.getResourceAsStream("Assets/Js/$assetName")
+        return Asset(getBytes(input), 200)
+    }
+}
+
+val assetsResponse = object : AssetFactory {
+    override fun getContent(params: HashMap<RouteElement, String>): Asset {
+        val assetName = params[assetsFolder]
+        val input = javaClass.classLoader.getResourceAsStream("Assets/$assetName")
+        return Asset(getBytes(input), 200)
+    }
+}
+
+val faviconResponse = object : AssetFactory {
+    override fun getContent(params: HashMap<RouteElement, String>): Asset {
+        val assetName = faviconStaticRoute.name
+        val input = javaClass.classLoader.getResourceAsStream(assetName)
+        return Asset(getBytes(input), 200)
+    }
+}
+
+// Register assets routes
+dispatcher.registerRoute(assets, assetsResponse)
+dispatcher.registerRoute(assetsJs, assetsJsResponse)
+dispatcher.registerRoute(favicon, faviconResponse)
 ```
 ## Logging
 Dispatcher uses [Logger](https://github.com/milos85vasic/Logger) library for logging.
