@@ -1,7 +1,7 @@
 package net.milosvasic.dispatcher.route
 
 
-class Route private constructor() {
+open class Route protected constructor() {
 
     private val elements = mutableListOf<RouteElement>()
 
@@ -27,7 +27,7 @@ class Route private constructor() {
         return elements
     }
 
-    private fun addRouteElement(element: RouteElement) {
+    protected fun addRouteElement(element: RouteElement) {
         elements.add(element)
     }
 

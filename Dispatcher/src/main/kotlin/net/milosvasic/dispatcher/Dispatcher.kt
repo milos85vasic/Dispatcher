@@ -10,7 +10,9 @@ import net.milosvasic.dispatcher.logging.DispatcherLogger
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
 import net.milosvasic.dispatcher.response.ResponseAction
+import net.milosvasic.dispatcher.response.ResponseAsset
 import net.milosvasic.dispatcher.response.ResponseFactory
+import net.milosvasic.dispatcher.route.AssetsRoute
 import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route
 import net.milosvasic.dispatcher.route.RouteElement
@@ -33,6 +35,7 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
     private val executor = TaskExecutor.instance(10)
     private val actionRoutes = ConcurrentHashMap<Route, ResponseAction>()
     private val responseRoutes = ConcurrentHashMap<Route, ResponseFactory>()
+    private val assetRoutes = ConcurrentHashMap<AssetsRoute, ResponseAsset>()
     private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0)
 
     private val hook = Thread(Runnable {
@@ -93,6 +96,18 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         return result
     }
 
+    override fun registerRoute(route: AssetsRoute, responseAsset: ResponseAsset): Boolean {
+        assetRoutes.put(route, responseAsset)
+        val result = assetRoutes.keys.contains(route)
+        val message = "${Labels.ROUTE} [ $route ][ ${Labels.REGISTER.toUpperCase()} ][ $result ][ ${Labels.RESPONSE_ASSET} ]"
+        if (result) {
+            logger.i(LOG_TAG, message)
+        } else {
+            logger.w(LOG_TAG, message)
+        }
+        return result
+    }
+
     override fun unregisterRoute(route: Route): Boolean {
         var success = false
         if (actionRoutes.keys.contains(route)) {
@@ -133,6 +148,19 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
             }
         }
         val message = "${Labels.ROUTE} [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ][ ${Labels.RESPONSE_ACTION} ]"
+        logger.i(LOG_TAG, message)
+        return success
+    }
+
+    override fun unregisterRoute(route: AssetsRoute, responseAsset: ResponseAsset): Boolean {
+        var success = false
+        if (assetRoutes.keys.contains(route)) {
+            success = assetRoutes.remove(route, responseAsset)
+            if (!success) {
+                throw RouteUnregisterException()
+            }
+        }
+        val message = "${Labels.ROUTE}  [ $route ][ ${Labels.UNREGISTER.toUpperCase()} ][ $success ][ ${Labels.RESPONSE_ASSET} ]"
         logger.i(LOG_TAG, message)
         return success
     }
