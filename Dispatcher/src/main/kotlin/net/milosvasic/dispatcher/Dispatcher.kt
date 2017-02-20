@@ -209,6 +209,7 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
             }
             REQUEST_METHOD.POST -> {
                 logger.v(LOG_TAG, exchange.requestBody.toString())
+                error_404(exchange)
             }
             else -> {
                 val message = "${Messages.METHOD_NOT_SUPPORTED} Method [ ${exchange.requestMethod} ]"
