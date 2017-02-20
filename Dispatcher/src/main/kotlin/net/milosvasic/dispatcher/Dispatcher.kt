@@ -9,7 +9,10 @@ import net.milosvasic.dispatcher.executors.TaskExecutor
 import net.milosvasic.dispatcher.logging.DispatcherLogger
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
-import net.milosvasic.dispatcher.response.*
+import net.milosvasic.dispatcher.response.Response
+import net.milosvasic.dispatcher.response.ResponseAbstract
+import net.milosvasic.dispatcher.response.ResponseAction
+import net.milosvasic.dispatcher.response.ResponseFactory
 import net.milosvasic.dispatcher.response.assets.AssetFactory
 import net.milosvasic.dispatcher.route.AssetsRoute
 import net.milosvasic.dispatcher.route.DynamicRouteElement
@@ -68,6 +71,10 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         } else {
             throw IllegalStateException(Messages.DISPATCHER_NOT_RUNNING)
         }
+    }
+
+    override fun isRunning(): Boolean {
+        return running.get()
     }
 
     override fun registerRoute(route: Route, responseFactory: ResponseFactory): Boolean {

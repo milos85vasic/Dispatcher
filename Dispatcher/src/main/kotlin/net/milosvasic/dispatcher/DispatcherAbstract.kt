@@ -8,4 +8,6 @@ abstract class DispatcherAbstract(val instanceName: String, val port: Int) : Rou
 
     abstract fun stop()
 
+    abstract fun isRunning(): Boolean
+
 }
