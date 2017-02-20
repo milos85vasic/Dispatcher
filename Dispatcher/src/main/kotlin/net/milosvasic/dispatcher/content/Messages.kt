@@ -7,6 +7,7 @@ internal object Messages {
     val ERROR_404 = "Not found."
     val METHOD_NOT_SUPPORTED = "Method not supported."
     val DISPATCHER_TERMINATED = "Dispatcher is terminated."
+    val NO_PARAMETERS_AVAILABLE = "No parameters available"
     val ACTION_ROUTES_SHADOWING = "Action routes shadowing."
     val ASSETS_ROUTES_SHADOWING = "Assets routes shadowing."
     val DISPATCHER_RUNNING = "${Labels.DISPATCHER} is running."

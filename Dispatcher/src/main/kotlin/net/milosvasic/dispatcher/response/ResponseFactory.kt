@@ -5,6 +5,6 @@ import java.util.*
 
 interface ResponseFactory {
 
-    fun getResponse(params: HashMap<RouteElement, String>): Response
+    fun getResponse(params: HashMap<String, String>): Response
 
 }

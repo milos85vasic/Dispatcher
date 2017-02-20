@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     val logger = ConsoleLogger()
 
     val factory = object : ResponseFactory {
-        override fun getResponse(params: HashMap<RouteElement, String>): Response {
+        override fun getResponse(params: HashMap<String, String>): Response {
             return Response("Executed ${Date()} [ ${params.size} ]")
         }
     }
@@ -71,7 +71,7 @@ fun main(args: Array<String>) {
         }
     }
     dispatcher.registerRoute(routeStop, object : ResponseFactory {
-        override fun getResponse(params: HashMap<RouteElement, String>): Response {
+        override fun getResponse(params: HashMap<String, String>): Response {
             return Response("<h1>Dispatcher stopped</h1>")
         }
     })
@@ -89,12 +89,12 @@ fun main(args: Array<String>) {
             .build()
 
     val factoryAccounts = object : ResponseFactory {
-        override fun getResponse(params: HashMap<RouteElement, String>): Response {
+        override fun getResponse(params: HashMap<String, String>): Response {
             val builder = StringBuilder("<h1>We have parameters:</h1>")
             builder.append("<ul>")
             params.forEach {
                 element, value ->
-                builder.append("<li>${element.name} -> $value</li>")
+                builder.append("<li>$element -> $value</li>")
             }
             builder.append("</ul>")
             return Response(builder.toString())

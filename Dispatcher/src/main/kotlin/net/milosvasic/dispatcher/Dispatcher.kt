@@ -17,7 +17,6 @@ import net.milosvasic.dispatcher.response.assets.AssetFactory
 import net.milosvasic.dispatcher.route.AssetsRoute
 import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route
-import net.milosvasic.dispatcher.route.RouteElement
 import net.milosvasic.dispatcher.route.exception.RouteUnregisterException
 import net.milosvasic.logger.Logger
 import java.io.ByteArrayInputStream
@@ -204,12 +203,32 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
                 } else {
                     error_404(exchange)
                 }
-                val code = exchange.responseCode
-                logger.v(LOG_TAG, "<<< [ $code ] ${exchange.requestURI}")
+                logWithResponseCode(exchange)
             }
             REQUEST_METHOD.POST -> {
-                logger.v(LOG_TAG, exchange.requestBody.toString())
-                error_404(exchange)
+                val route = getRoute(exchange)
+                if (route != null) {
+                    val params = HashMap<String, String>() // TODO: Handle params shadowing!
+                    val postParams = getPostParams(exchange)
+                    val routeParams = getParams(route, RequestPath(exchange))
+                    params.putAll(postParams)
+                    params.putAll(routeParams)
+                    val routeResponse = responseRoutes[route]
+                    if (routeResponse != null) {
+                        val response = routeResponse.getResponse(params)
+                        try {
+                            sendResponse(exchange, response)
+                        } catch (e: Exception) {
+                            logger.e(LOG_TAG, "${Labels.ERROR}: $e")
+                        }
+                    } else {
+                        confirmation(exchange)
+                    }
+                    actionRoutes[route]?.onAction()
+                } else {
+                    error_404(exchange)
+                }
+                logWithResponseCode(exchange)
             }
             else -> {
                 val message = "${Messages.METHOD_NOT_SUPPORTED} Method [ ${exchange.requestMethod} ]"
@@ -250,8 +269,8 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         return null
     }
 
-    private fun getParams(route: Route, path: RequestPath): HashMap<RouteElement, String> {
-        val params = HashMap<RouteElement, String>()
+    private fun getParams(route: Route, path: RequestPath): HashMap<String, String> {
+        val params = HashMap<String, String>()
         try {
             val regex = route.getRegex()
             val pattern = Pattern.compile(regex)
@@ -260,12 +279,27 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
                 route.getElements().forEachIndexed {
                     index, element ->
                     if (element is DynamicRouteElement) {
-                        params.put(element, matcher.group(index + 1))
+                        params.put(element.name, matcher.group(index + 1))
                     }
                 }
             }
         } catch (e: Exception) {
             logger.e(LOG_TAG, e.toString())
+        }
+        return params
+    }
+
+    private fun getPostParams(exchange: HttpExchange): HashMap<String, String> {
+        val params = HashMap<String, String>()
+        val query = exchange.requestURI.query
+        val elements = query.split("&")
+        elements.forEachIndexed { index, element ->
+            val parameters = element.split("=")
+            if (parameters.size == 2) {
+                params[parameters[0]] = parameters[1]
+            } else {
+                logger.w(LOG_TAG, "${Messages.NO_PARAMETERS_AVAILABLE} [ $element ]")
+            }
         }
         return params
     }
@@ -315,6 +349,11 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         input.copyTo(output)
         input.close()
         output.close()
+    }
+
+    private fun logWithResponseCode(exchange: HttpExchange) {
+        val code = exchange.responseCode
+        logger.v(LOG_TAG, "<<< [ $code ] ${exchange.requestURI}")
     }
 
 }
