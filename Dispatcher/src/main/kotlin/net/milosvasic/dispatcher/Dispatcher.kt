@@ -10,6 +10,7 @@ import net.milosvasic.dispatcher.logging.DispatcherLogger
 import net.milosvasic.dispatcher.request.REQUEST_METHOD
 import net.milosvasic.dispatcher.request.RequestPath
 import net.milosvasic.dispatcher.response.*
+import net.milosvasic.dispatcher.response.assets.AssetFactory
 import net.milosvasic.dispatcher.route.AssetsRoute
 import net.milosvasic.dispatcher.route.DynamicRouteElement
 import net.milosvasic.dispatcher.route.Route

@@ -1,23 +1,24 @@
 package net.milosvasic.`try`.dispatcher
 
 import net.milosvasic.dispatcher.Dispatcher
-import net.milosvasic.dispatcher.response.Asset
-import net.milosvasic.dispatcher.response.AssetFactory
+import net.milosvasic.dispatcher.response.assets.Asset
+import net.milosvasic.dispatcher.response.assets.AssetFactory
 import net.milosvasic.dispatcher.response.Response
 import net.milosvasic.dispatcher.response.ResponseFactory
+import net.milosvasic.dispatcher.response.assets.image.AssetICON
 import net.milosvasic.dispatcher.route.*
-import net.milosvasic.logger.ConsoleLogger
+// import net.milosvasic.logger.ConsoleLogger
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.*
 
-private class TryHtmlPage
+// private class TryHtmlPage
 
 fun main(args: Array<String>) {
 
-    val logger = ConsoleLogger()
-    val TAG = TryHtmlPage::class
+//    val logger = ConsoleLogger()
+//    val TAG = TryHtmlPage::class
 
     fun getBytes(input: InputStream?): ByteArray? {
         return input?.readBytes()
@@ -85,10 +86,10 @@ fun main(args: Array<String>) {
             .build()
 
     val faviconResponse = object : AssetFactory {
-        override fun getContent(params: HashMap<RouteElement, String>): Asset {
+        override fun getContent(params: HashMap<RouteElement, String>): AssetICON {
             val assetName = faviconStaticRoute.name
             val input = javaClass.classLoader.getResourceAsStream(assetName)
-            return Asset(getBytes(input))
+            return AssetICON(getBytes(input))
         }
     }
 

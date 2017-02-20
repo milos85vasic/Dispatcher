@@ -1,4 +1,4 @@
-package net.milosvasic.dispatcher.response
+package net.milosvasic.dispatcher.response.assets
 
 import net.milosvasic.dispatcher.route.RouteElement
 import java.util.*

@@ -1,7 +1,7 @@
 package net.milosvasic.dispatcher.route
 
 import net.milosvasic.dispatcher.response.ResponseAction
-import net.milosvasic.dispatcher.response.AssetFactory
+import net.milosvasic.dispatcher.response.assets.AssetFactory
 import net.milosvasic.dispatcher.response.ResponseFactory
 
 
