@@ -8,7 +8,7 @@ Library is currently in the phase of development.
 
 ## What is supported?
 
-- Library supports http GET as a mechanism to request something or to trigger an action.
+- Library supports http GET and POST as a mechanism to request something or to trigger an action.
 - Static and dynamic routes
 - Routes for assets (static and dynamic)
 
@@ -76,13 +76,15 @@ val routeAccounts = Route.Builder()
         .build()
 
 // Response factory is responsible for providing response for the route
+// In the following code snippet it prints all dynamic route passed params
+// and any params passed via POST.
 val factoryAccounts = object : ResponseFactory {
-    override fun getResponse(params: HashMap<RouteElement, String>): Response {
+    override fun getResponse(params: HashMap<String, String>): Response {
         val builder = StringBuilder("<h1>We have parameters:</h1>")
         builder.append("<ul>")
         params.forEach {
             element, value ->
-            builder.append("<li>${element.name} -> $value</li>")
+            builder.append("<li>$element -> $value</li>")
         }
         builder.append("</ul>")
         return Response(builder.toString())
@@ -135,7 +137,7 @@ val favicon = AssetsRoute.Builder()
 
 // Define factories to get bytes for the assets:
 val assetsJsResponse = object : AssetFactory {
-    override fun getContent(params: HashMap<RouteElement, String>): Asset {
+    override fun getContent(params: HashMap<String, String>): Asset {
         val assetName = params[assetsFolder]
         val input = javaClass.classLoader.getResourceAsStream("Assets/Js/$assetName")
         return Asset(getBytes(input), 200)
@@ -143,7 +145,7 @@ val assetsJsResponse = object : AssetFactory {
 }
 
 val assetsResponse = object : AssetFactory {
-    override fun getContent(params: HashMap<RouteElement, String>): Asset {
+    override fun getContent(params: HashMap<String, String>): Asset {
         val assetName = params[assetsFolder]
         val input = javaClass.classLoader.getResourceAsStream("Assets/$assetName")
         return Asset(getBytes(input), 200)
@@ -151,7 +153,7 @@ val assetsResponse = object : AssetFactory {
 }
 
 val faviconResponse = object : AssetFactory {
-    override fun getContent(params: HashMap<RouteElement, String>): Asset {
+    override fun getContent(params: HashMap<String, String>): Asset {
         val assetName = faviconStaticRoute.name
         val input = javaClass.classLoader.getResourceAsStream(assetName)
         return Asset(getBytes(input), 200)
