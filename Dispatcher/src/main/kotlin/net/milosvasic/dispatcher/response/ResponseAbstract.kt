@@ -15,7 +15,9 @@ abstract class ResponseAbstract<out T>(val content: T, val code: Int) {
     open fun getHeaders(): Headers {
         val headers = Headers()
         headers.add("Server", "${Labels.DISPATCHER} ${version.VERSION.replace("_", " ")}")
-        headers.add(HEADER.CACHE_CONTROL.value, "max-age=3600")
+        headers.add(HEADER.PRAGMA.value, "no-cache")
+        headers.add(HEADER.EXPIRES.value, 0.toString())
+        headers.add(HEADER.CACHE_CONTROL.value, "no-cache, no-store, must-revalidate")
         return headers
     }
 

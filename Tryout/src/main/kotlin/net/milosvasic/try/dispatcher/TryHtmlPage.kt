@@ -1,13 +1,14 @@
 package net.milosvasic.`try`.dispatcher
 
+// import net.milosvasic.logger.ConsoleLogger
 import net.milosvasic.dispatcher.Dispatcher
-import net.milosvasic.dispatcher.response.assets.Asset
-import net.milosvasic.dispatcher.response.assets.AssetFactory
 import net.milosvasic.dispatcher.response.Response
 import net.milosvasic.dispatcher.response.ResponseFactory
+import net.milosvasic.dispatcher.response.assets.AssetFactory
+import net.milosvasic.dispatcher.response.assets.application.AssetJS
 import net.milosvasic.dispatcher.response.assets.image.AssetICON
+import net.milosvasic.dispatcher.response.assets.image.AssetJPEG
 import net.milosvasic.dispatcher.route.*
-// import net.milosvasic.logger.ConsoleLogger
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -59,24 +60,25 @@ fun main(args: Array<String>) {
             .addRouteElement(assetsFolder)
             .build()
 
-    val assets = AssetsRoute.Builder()
+    val assetsImages = AssetsRoute.Builder()
             .addRouteElement(StaticRouteElement("Assets"))
+            .addRouteElement(StaticRouteElement("Images"))
             .addRouteElement(assetsFolder)
             .build()
 
     val assetsJsResponse = object : AssetFactory {
-        override fun getContent(params: HashMap<RouteElement, String>): Asset {
+        override fun getContent(params: HashMap<RouteElement, String>): AssetJS {
             val assetName = params[assetsFolder]
             val input = javaClass.classLoader.getResourceAsStream("Assets/Js/$assetName")
-            return Asset(getBytes(input), 200)
+            return AssetJS(getBytes(input), 200)
         }
     }
 
-    val assetsResponse = object : AssetFactory {
-        override fun getContent(params: HashMap<RouteElement, String>): Asset {
+    val assetsImagesResponse = object : AssetFactory {
+        override fun getContent(params: HashMap<RouteElement, String>): AssetJPEG {
             val assetName = params[assetsFolder]
-            val input = javaClass.classLoader.getResourceAsStream("Assets/$assetName")
-            return Asset(getBytes(input), 200)
+            val input = javaClass.classLoader.getResourceAsStream("Assets/Images/$assetName")
+            return AssetJPEG(getBytes(input), 200)
         }
     }
 
@@ -94,7 +96,7 @@ fun main(args: Array<String>) {
     }
 
     dispatcher.registerRoute(rootRoute, homepage)
-    dispatcher.registerRoute(assets, assetsResponse)
+    dispatcher.registerRoute(assetsImages, assetsImagesResponse)
     dispatcher.registerRoute(assetsJs, assetsJsResponse)
     dispatcher.registerRoute(favicon, faviconResponse)
     dispatcher.start()
