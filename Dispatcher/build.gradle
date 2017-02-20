@@ -32,6 +32,9 @@ dependencies {
     compile files("libs/Logger_V1.1.2.jar")
 }
 
+sourceSets.main.kotlin.srcDirs += 'src/main/kotlin'
+sourceSets.main.kotlin.srcDirs += 'build/generated-src/kotlin'
+
 int alpha = 7
 int versionNumber = 1
 int secondaryVersion = 0
@@ -41,6 +44,22 @@ if (alpha > 0) {
     version += "_Alpha_" + alpha
 }
 jar.archiveName = "Dispatcher_V" + version + ".jar"
+
+task generateSources {
+    final destination = new File(
+            "${System.getProperty("user.dir")}${File.separator}Dispatcher${File.separator}build${File.separator}generated-src${File.separator}kotlin${File.separator}net${File.separator}milosvasic${File.separator}dispatcher"
+    )
+    println("We are about to generate sources [ ${destination.absolutePath} ]")
+    if (destination.exists() || destination.mkdirs()) {
+        final classFile = new File(
+                "$destination${File.separator}DispatcherVersion.kt"
+        )
+        classFile.write("package net.milosvasic.dispatcher data class DispatcherVersion(val VERSION : String = \"$version\")")
+        println("We generated file [ ${classFile.absolutePath} ]")
+    } else {
+        println("Couldn't initialize [ ${destination.absolutePath} ]")
+    }
+}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'

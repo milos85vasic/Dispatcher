@@ -19,4 +19,5 @@ repositories {
 
 dependencies.compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-sourceSets.main.java.srcDirs += 'src/main/kotlin'
+sourceSets.main.kotlin.srcDirs += 'src/main/kotlin'
+sourceSets.main.kotlin.srcDirs += 'build/generated-src/kotlin'

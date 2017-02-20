@@ -275,6 +275,9 @@ class Dispatcher(instanceName: String, port: Int) : DispatcherAbstract(instanceN
         if (bytes == null || bytes.isEmpty()) {
             error_404(exchange)
         } else {
+            for (key in response.getHeaders().keys) {
+                exchange.responseHeaders[key] = response.getHeaders()[key]
+            }
             exchange.sendResponseHeaders(response.code, 0)
             val output = exchange.responseBody
             val input = ByteArrayInputStream(bytes)
